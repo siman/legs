@@ -1,0 +1,169 @@
+[
+	{
+		"action": "VERIFY_VALUES/names",
+		"values" : {
+			"names" : ["companyId"]
+		}
+	},{
+		"action" : "REPLACE_REGEX/companyId/regexMatch/regexReplace",
+		"values" : {
+			"regexMatch" : "^(.*)$",
+			"regexReplace" : "http://adfs2.matimop.org.il:8020/CompanyProfilePopup.aspx?id=$1"
+		},
+		"yields" : "s_link"
+	},{
+		"action" : "FETCH/s_link",
+		"yields" : "s_html"
+	},
+	{
+		"action": "EXTRACT_HTML_XPATH_FIRST/s_html/selector/validator",
+		"values": {
+			"selector": "//*[@id='lblLocCompName']/text()",
+			"validator": ".*"
+		},
+		"yields": "companyName"
+	},
+	{
+		"action": "EXTRACT_HTML_XPATH_FIRST/s_html/selector/validator",
+		"values": {
+			"selector": "//*[@id='lblMainContact1PersonName']/text()",
+			"validator": ".*"
+		},
+		"yields": "mainContactPerson"
+	},
+	{
+		"action": "EXTRACT_HTML_XPATH_FIRST/s_html/selector/validator",
+		"values": {
+			"selector": "//*[@id='lblTechnicalContactPersonName']/text()",
+			"validator": ".*"
+		},
+		"yields": "technicalContactPerson"
+	},
+	{
+		"action": "EXTRACT_HTML_XPATH_FIRST/s_html/selector/validator",
+		"values": {
+			"selector": "//*[@id='lblOwnership']/text()",
+			"validator": ".*"
+		},
+		"yields": "ownership"
+	},
+	{
+		"action": "EXTRACT_HTML_XPATH_FIRST/s_html/selector/validator",
+		"values": {
+			"selector": "//*[@id='lblNumberOfEmployees']/text()",
+			"validator": ".*"
+		},
+		"yields": "numberOfEmployees"
+	},
+	{
+		"action": "EXTRACT_HTML_XPATH_FIRST/s_html/selector/validator",
+		"values": {
+			"selector": "//*[@id='lblMainContact1Position']/text()",
+			"validator": ".*"
+		},
+		"yields": "mainContactPosition"
+	},
+	{
+		"action": "EXTRACT_HTML_XPATH_FIRST/s_html/selector/validator",
+		"values": {
+			"selector": "//*[@id='lblTechnicalContactPersonPosition']/text()",
+			"validator": ".*"
+		},
+		"yields": "techContactPosition"
+	},
+	{
+		"action": "EXTRACT_HTML_XPATH_FIRST/s_html/selector/validator",
+		"values": {
+			"selector": "//*[@id='lblEstablished']/text()",
+			"validator": ".*"
+		},
+		"yields": "established"
+	},
+	{
+		"action": "EXTRACT_HTML_XPATH_FIRST/s_html/selector/validator",
+		"values": {
+			"selector": "//*[@id='lblAddress']/text()",
+			"validator": ".*"
+		},
+		"yields": "address"
+	},
+	{
+		"action": "EXTRACT_HTML_XPATH_FIRST/s_html/selector/validator",
+		"values": {
+			"selector": "//*[@id='lblFax']/text()",
+			"validator": ".*"
+		},
+		"yields": "fax"
+	},
+	{
+		"action": "EXTRACT_HTML_XPATH_FIRST/s_html/selector/validator",
+		"values": {
+			"selector": "//*[@id='hplSite']/text()",
+			"validator": ".*"
+		},
+		"yields": "website"
+	},
+	{
+		"action": "EXTRACT_HTML_XPATH_FIRST/s_html/selector/validator",
+		"values": {
+			"selector": "//*[@id='lblPhone']/text()",
+			"validator": ".*"
+		},
+		"yields": "phone"
+	},
+	{
+		"action": "EXTRACT_HTML_XPATH_FIRST/s_html/selector/validator",
+		"values": {
+			"selector": "//*[@id='lblEmail']/text()",
+			"validator": ".*"
+		},
+		"yields": "email"
+	},
+	{
+		"action": "EXTRACT_HTML_XPATH_FIRST/s_html/selector/validator",
+		"values": {
+			"selector": "//*[@id='lblApplication']/text()",
+			"validator": ".*"
+		},
+		"yields": "field"
+	},
+	{
+		"action": "EXTRACT_HTML_XPATH_FIRST/s_html/selector/validator",
+		"values": {
+			"selector": "//*[@id='lblSubApplication']/text()",
+			"validator": ".*"
+		},
+		"yields": "subField"
+	},
+	{
+		"action": "EXTRACT_HTML_XPATH_FIRST/s_html/selector/validator",
+		"values": {
+			"selector": "//*[@id='lblDesc']/text()",
+			"validator": ".*"
+		},
+		"yields": "description"
+	},
+	{
+		"action": "EXTRACT_HTML_XPATH_FIRST/s_html/selector/validator",
+		"values": {
+			"selector": "//*[@id='lblTechnology']/text()",
+			"validator": ".*"
+		},
+		"yields": "technology"
+	},
+	{
+		"action": "EXTRACT_HTML_XPATH_FIRST/s_html/selector/validator",
+		"values": {
+			"selector": "//*[@id='lblTargetMarkets']/text()",
+			"validator": ".*"
+		},
+		"yields": "targetMarkets"
+	},{
+		"action" : "TO_FILE_AS_JSON/keys/path",
+		"values" : {
+			"keys" : ["companyName", "mainContactPerson", "technicalContactPerson", "ownership", "numberOfEmployees", "mainContactPosition", "techContactPosition", "established", "address", "fax", "website", "phone", "email", "field", "subField", "description", "technology", "targetMarkets"],
+			"path" : "/tmp/matimop.json"
+		}
+	}
+
+]

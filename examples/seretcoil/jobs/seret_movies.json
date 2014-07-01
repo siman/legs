@@ -1,0 +1,51 @@
+[
+	{
+		"action" : "io.legs.specialized.SimpleScraper/FETCH/urlP",
+		"values": {
+			"urlP" : "http://www.seret.co.il/movies/index.asp?catCase=2"
+		},
+		"yields" : "seretHtml"
+	},{
+		"action" : "io.legs.specialized.SimpleScraper/EXTRACT_HTML_XPATH/seretHtml/selector/validator",
+		"values": {
+			"selector" : "//li/a/@href",
+			"validator" : ".*movies.*"
+		},
+		"yields" : "movies"
+	},{
+		"action" : "io.legs.specialized.Tools/MAP_PAR/movies/toParam/extractLinks",
+		"values" : {
+			"toParam":"movie",
+			"extractLinks" : [{
+				"action" : "io.legs.specialized.Strings/EXTRACT_REGEX/movie/regex",
+				"values" : {
+					"regex" : ".*/movies/(s_movies.*)$"
+				}
+			}]
+		},
+		"yields" : "suffixes"
+	},{
+		"action" : "io.legs.specialized.Tools/MAP_PAR/suffixes/toParam/extractLinks",
+		"values" : {
+			"toParam":"suffix",
+			"extractLinks" : [{
+				"action" : "io.legs.specialized.Strings/REPLACE_REGEX/suffix/regexMatch/regexReplace",
+				"values" : {
+					"regexMatch" : "^(.*)$",
+					"regexReplace" : "http://www.seret.co.il/movies/$1"
+				}
+			}]
+		},
+		"yields" : "links"
+	},{
+		"action" : "io.legs.specialized.Queue/ADD_JOB/instructions/description/labels/inputIndices",
+		"values" : {
+			"instructionsPath" : "seret_movies_p2",
+			"description" : "part 2 for seret movies",
+			"labels" : ["web","seret.co.il","seret.co.il-movies"],
+			"inputIndices": ["links"]
+		}
+	}
+]
+
+

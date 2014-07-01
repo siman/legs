@@ -1,0 +1,55 @@
+[
+	{
+		"action" : "FETCH/url",
+		"values" : {
+			"url" : "https://www.google.com/events/io/schedule"
+		},
+		"yields" : "gio14"
+	},{
+		"action" : "EXTRACT_HTML_XPATH/gio14/selector/validator",
+		"values" : {
+			"selector" : "//a[@data-id]/@href",
+			"validator" : "^/events.*"
+		},
+		"yields" : "links"
+	},{
+		"action": "MAP_PAR/links/toParam/nextSteps",
+		"values" : {
+			"toParam" : "linkPrefix",
+			"nextSteps" : [
+				{
+					"action" : "io.legs.specialized.LinkTracker/CHECK_EXIST_CREATE/domain/linkPrefix",
+					"values" : {
+						"domain" : "gio14"
+					},
+					"yields" : "isExists"
+				},{
+					"action" : "io.legs.specialized.Tools/IF/isExists/trueInstructions/falseInstructions",
+					"values" : {
+						"trueInstructions" : [],
+						"falseInstructions" : [
+							{
+								"action" : "REPLACE_REGEX/linkPrefix/regexMatch/regexReplace",
+								"values" : {
+									"regexMatch" : "^(.*)$",
+									"regexReplace" : "https://www.google.com$1?format=json"
+								},
+								"yields" : "googleLink"
+							},
+							{
+								"action" : "FETCH_RAW/googleLink",
+								"yields" : "json_data"
+							},{
+								"action" : "TO_FILE/keys/path",
+								"values" : {
+									"keys" : ["linkPrefix","json_data"],
+									"path" : "/tmp/gio14.json"
+								}
+							}
+						]
+					}
+				}
+			]
+		}
+	}
+]

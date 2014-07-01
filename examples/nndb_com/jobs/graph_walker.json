@@ -1,0 +1,104 @@
+[
+	{
+		"action" : "io.legs.specialized.Strings/REPLACE_REGEX/inputNodeId/regexMatch/regexReplace",
+		"values" : {
+			"regexMatch" : "^(.*)$",
+			"regexReplace" : "http://mapper.nndb.com/mapperx/?r=271&class=node&method=expand&id=$1"
+		},
+		"yields" : "url"
+	},{
+		"action" : "io.legs.specialized.SimpleScraper/FETCH_RAW/url",
+		"yields" : "html"
+	},{
+		"action" : "io.legs.specialized.SimpleScraper/EXTRACT_XML_XPATH/html/selector/validator",
+		"values": {
+			"selector" : "//xid",
+			"validator" : ".*"
+		},
+		"yields" : "xids"
+	},{
+		"action" : "io.legs.specialized.Tools/MAP_PAR/xids/toParam/nextSteps",
+		"values" : {
+			"toParam":"xid",
+			"nextSteps" : [{
+				"action" : "io.legs.specialized.LinkTracker/CHECK_EXIST_CREATE/domain/xid",
+				"values" : {
+					"domain" : "nndb_com_xids"
+				},
+				"yields" : "isOldXid"
+			},{
+				"action" : "io.legs.specialized.Tools/IF/isOldXid/trueInstructions/falseInstructions",
+				"values" : {
+					"trueInstructions" : [],
+					"falseInstructions" : [{
+						"action" : "io.legs.specialized.Strings/REPLACE_REGEX/xid/regexMatch/regexReplace",
+						"values" : {
+							"regexMatch" : "^(.*)$",
+							"regexReplace" : "//node[xid = $1]/string-join((xid,name,_links),'|')"
+						},
+						"yields" : "xpath"
+					},{
+						"action" : "io.legs.specialized.SimpleScraper/EXTRACT_XML_XPATH/html/xpath/validator",
+						"values": {
+							"validator" : ".*"
+						},
+						"yields" : "data"
+					},{
+						"action" : "io.legs.specialized.Persistor/TO_FILE/keys/path",
+						"values" : {
+							"keys" : ["data"],
+							"path" : "/tmp/out.txt"
+						}
+					}]
+				}
+			}]
+		}
+	},{
+		"action" : "io.legs.specialized.SimpleScraper/EXTRACT_XML_XPATH/html/selector/validator",
+		"values": {
+			"selector" : "//_links",
+			"validator" : ".*"
+		},
+		"yields" : "links"
+	},{
+		"action" : "io.legs.specialized.Tools/MAP_PAR/links/toParam/nextSteps",
+		"values" : {
+			"toParam":"_links",
+			"nextSteps" : [{
+				"action" : "io.legs.specialized.Strings/SPLIT/_links/splitBy",
+				"values": {
+					"splitBy" : " "
+				},
+				"yields" : "__links"
+			},{
+				"action" : "io.legs.specialized.Tools/MAP_PAR/__links/toParam/nextSteps",
+				"values" : {
+					"toParam":"inputNodeId",
+					"nextSteps" : [{
+						"action" : "io.legs.specialized.LinkTracker/CHECK_EXIST_CREATE/domain/inputNodeId",
+						"values" : {
+							"domain" : "nndb_com"
+						},
+						"yields" : "newNode"
+					},{
+						"action" : "io.legs.specialized.Tools/IF/newNode/trueInstructions/falseInstructions",
+						"values" : {
+							"trueInstructions" : [],
+							"falseInstructions" : [{
+								"action" : "io.legs.specialized.Queue/ADD_JOB/instructions/description/labels/inputIndices",
+								"values" : {
+									"instructions" : "graph_walker",
+									"description" : "recursive NNDB graph walker",
+									"labels" : ["nndb"],
+									"inputIndices" : ["inputNodeId"]
+								}
+							}]
+						}
+					}]
+				}
+			}]
+		}
+	}
+]
+
+

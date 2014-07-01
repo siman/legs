@@ -1,0 +1,60 @@
+<nodes
+  generator="mapper/1.0.266.46601(mapper013085)"
+  created="1389357743"
+  rights="Copyright 2014 mapper@nndb.com"
+  notice="No part of this website may be reproduced without permission">
+<node>
+  <xid>93937</xid>
+  <name>France Nuyen</name>
+  <url>people/219/000093937/</url>
+  <summary>The Joy Luck Club</summary>
+  <_role>a a a a a a a a a a a a a a a a a a a</_role>
+  <_linkdata>r s</_linkdata>
+  <_links>22655 23273</_links>
+  <imdb>http://www.imdb.com/name/nm0638395/</imdb>
+  <_film>32940 33556 37173 37402 40998 41884 66454 78009 83952 88309 88505 137952 140534 161817 170364 208869 230833 240668 245085</_film>
+  <deathcause>0</deathcause>
+  <gender>2</gender>
+  <_roles>19</_roles>
+  <birthdate>31-Jul-1939</birthdate>
+  <occupation>1</occupation>
+  <_occupation>Actor</_occupation>
+  <_occupation2>0</_occupation2>
+  <_occupation3>0</_occupation3>
+  <_zodiac>4,leo</_zodiac>
+  <_age>71,AGE</_age>
+</node>
+<node>
+  <_type>tv</_type>
+  <_icon>mc_tapio_tv0</_icon>
+  <_path></_path>
+  <xid>66704</xid>
+  <name>The Greatest American Hero</name>
+  <url>tv/902/000066704/</url>
+  <summary>tv</summary>
+  <_links>23273 24212 24967 25342 109002 132026</_links>
+  <_linkdata>tv cr tv tv tv tv</_linkdata>
+</node>
+<node>
+  <_type>tv</_type>
+  <_icon>mc_tapio_tv0</_icon>
+  <_path></_path>
+  <xid>66759</xid>
+  <name>I Spy</name>
+  <url>tv/957/000066759/</url>
+  <summary>tv</summary>
+  <_links>22608 23273 130920</_links>
+  <_linkdata>tv tv tv</_linkdata>
+</node>
+<node>
+  <_type>tv</_type>
+  <_icon>mc_tapio_tv0</_icon>
+  <_path></_path>
+  <xid>109501</xid>
+  <name>Trackdown</name>
+  <url>tv/828/000109501/</url>
+  <summary>tv</summary>
+  <_links>23273 109502</_links>
+  <_linkdata>tv tv</_linkdata>
+</node>
+</nodes>

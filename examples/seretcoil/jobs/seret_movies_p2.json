@@ -1,0 +1,11 @@
+[
+	{
+		"action" : "io.legs.specialized.Tools/ECHO/value",
+		"values": {
+			"value" : "hello world!"
+		},
+		"yields" : "echoed"
+	}
+]
+
+

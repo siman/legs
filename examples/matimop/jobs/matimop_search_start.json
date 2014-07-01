@@ -1,0 +1,110 @@
+[
+	{
+		"action": "VERIFY_VALUES/names",
+		"values" : {
+			"names" : ["s_aValue"]
+		}
+	},{
+        "action" : "WD_VISIT/url",
+        "values": {
+            "url" : "http://adfs2.matimop.org.il:8020/PublicCompanySearch.aspx"
+        },
+        "yields" : "wd_main"
+    },{
+        "action" : "WD_SELECT_DROPDOWN/wd_main/selector/s_aValue",
+        "values" : {
+            "selector" : "//select[@id='ddlApplication']"
+        }
+    },{
+        "action": "WD_CLICK/wd_main/clickSelector",
+        "values" : {
+            "clickSelector" : "//input[@id='btnSearch']"
+        }
+    },{
+        "action" : "WD_WAIT_UNTIL_SELECTOR/wd_main/validator",
+        "values" : {
+            "validator" : "//table[@id='gwResult']"
+        }
+    },{
+		"action" : "LOOP_WHILE/check/over",
+		"values" : {
+			"check" : [
+				{
+					"action" : "WD_XPATH_CHECK/wd_main/xpath",
+					"values" : {
+						"xpath" : "(//table[@id='gwResult']//table)[1]//td[not(a)]/following-sibling::td[1]"
+					},
+					"yields" : "b_isNextPage"
+				}
+			],
+			"over" : [
+				{
+					"action" : "WD_GET_HTML/wd_main",
+					"yields" : "s_html"
+				},{
+					"action" : "EXTRACT_HTML_XPATH/s_html/selector/validator",
+					"values" : {
+						"selector" : "//table[@id='gwResult']//a/@href",
+						"validator" : ".*"
+					},
+					"yields" : "l_hrefs"
+				},{
+					"action" : "MAP_REDUCE/l_hrefs/map/reduce",
+					"values" :{
+						"map" : "function map(item, collection, emitter){ if (item.startsWith(\"CompanyProfilePopup.aspx\")) emitter.emit(\"out\",item.replace(\"CompanyProfilePopup.aspx?id=\",\"\")) }",
+						"reduce" : "function reduce(key, values){ return values }"
+					},
+					"yields" : "map_links"
+				},{
+					"action" : "GET_MAP_KEY/map_links/key",
+					"values" : {
+						"key" : "out"
+					},
+					"yields" : "l_links"
+				},{
+					"action": "MAP_PAR/l_links/toParam/nextSteps",
+					"values" : {
+						"toParam" : "companyId",
+						"nextSteps" : [
+							{
+								"action" : "ECHO/companyId"
+							},{
+								"action" : "ADD_JOB/instructions/description/labels/inputIndices",
+								"values" : {
+									"instructions" : "matimop_scrape_company",
+									"description" : "scrape a company page",
+									"labels" : ["matimop"],
+									"inputIndices" : ["companyId"]
+								}
+							}
+						]
+					}
+				},{
+					"action" : "WD_XPATH_CHECK/wd_main/xpath",
+					"values" : {
+						"xpath" : "(//table[@id='gwResult']//table)[1]//td[not(a)]/following-sibling::td[1]"
+					},
+					"yields" : "b_isNextPage"
+				},{
+					"action" : "IF/b_isNextPage/trueInstructions/falseInstructions",
+					"values" : {
+						"trueInstructions" : [
+							{
+								"action": "WD_CLICK/wd_main/clickSelector",
+								"values" : {
+									"clickSelector" : "(//table[@id='gwResult']//table)[1]//td[not(a)]/following-sibling::td[1]/a"
+								}
+							},{
+								"action" : "WD_WAIT_UNTIL_SELECTOR/wd_main/xpath",
+								"values" : {
+									"xpath" : "//table[@id='gwResult']"
+								}
+							}
+						],
+						"falseInstructions" : []
+					}
+				}
+			]
+		}
+	},{ "action" : "WD_CLOSE/wd_main" }
+]

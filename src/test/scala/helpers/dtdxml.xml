@@ -1,0 +1,29 @@
+<nodes
+		generator="mapper/1.0.266.46601(mapper014840)"
+		created="1390158919"
+		rights="Copyright 2014 mapper@nndb.com"
+		notice="No part of this website may be reproduced without permission">
+	<node>
+		<xid>160713</xid>
+		<name>Deanna Casaluce</name>
+		<url>people/196/000160713/</url>
+		<summary>Alex Nu&ntilde;ez on Degrassi</summary>
+		<_role>a</_role>
+		<wikipedia>http://en.wikipedia.org/wiki/Deanna_Casaluce</wikipedia>
+		<_linkdata>tv</_linkdata>
+		<_links>110104</_links>
+		<imdb>http://www.imdb.com/name/nm1714757/</imdb>
+		<orientation>0</orientation>
+		<_film>169816</_film>
+		<deathcause>0</deathcause>
+		<gender>2</gender>
+		<_roles>1</_roles>
+		<birthdate>7-Feb-1986</birthdate>
+		<occupation>1</occupation>
+		<_occupation>Actor</_occupation>
+		<_occupation2>0</_occupation2>
+		<_occupation3>0</_occupation3>
+		<_zodiac>10,aquarius</_zodiac>
+		<_age>24,AGE</_age>
+	</node>
+</nodes>

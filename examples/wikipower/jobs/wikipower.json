@@ -1,0 +1,47 @@
+[
+	{
+		"action" : "io.legs.specialized.Numbers/GENERATE/start/end",
+		"values": {
+			"start" : 22236,
+			"end" : 22238
+		},
+		"yields" : "numbers"
+	},{
+		"action" : "io.legs.specialized.Tools/MAP_PAR/numbers/toParam/nextSteps",
+		"values" : {
+			"toParam":"number",
+			"nextSteps" : [{
+				"action" : "io.legs.specialized.Casts/CAST/number/toType",
+				"values" :{
+					"toType" : "String"
+				},
+				"yields" : "numberStr"
+			},{
+				"action" : "io.legs.specialized.Strings/REPLACE_REGEX/numberStr/regexMatch/regexReplace",
+				"values" : {
+					"regexMatch" : "^(.*)$",
+					"regexReplace" : "http://mapper.nndb.com/mapperx/?r=271&class=node&method=expand&id=$1"
+				},
+				"yields" : "url"
+			},{
+				"action" : "io.legs.specialized.SimpleScraper/FETCH_RAW/url",
+				"yields" : "html"
+			},{
+				"action" : "io.legs.specialized.SimpleScraper/EXTRACT_XML_XPATH/html/selector/validator",
+				"values": {
+					"selector" : "for $n in //node return string-join(($n/xid,$n/name,$n/_links),'|')",
+					"validator" : ".*"
+				},
+				"yields" : "data"
+			},{
+				"action" : "io.legs.specialized.Persistor/TO_FILE/keys/path",
+				"values" : {
+					"keys" : ["data"],
+					"path" : "/home/romansky/Code/legs/examples/wikipower/out.txt"
+				}
+			}]
+		}
+	}
+]
+
+
