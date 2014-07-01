@@ -1,0 +1,16 @@
+# See http://about.travis-ci.org/docs/user/build-configuration/
+language: scala
+scala:
+  - 2.10.4
+# whitelist branches for now. need backport branch to support 2.8.x
+branches:
+  only:
+    - master
+services:
+    - redis-server
+notifications:
+  email:
+    recipients:
+      - roman.land@gmail.com
+jdk:
+  - oraclejdk8
