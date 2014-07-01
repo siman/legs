@@ -1,5 +1,10 @@
-Legs.io - scraping and job orchestration library
+Legs.io
 ====
+
+scraping and job orchestration library
+
+[![Build Status](https://travis-ci.org/uniformlyrandom/legs.png)](https://travis-ci.org/uniformlyrandom/legs)
+
 
 ### Project goal
 
