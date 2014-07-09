@@ -23,7 +23,7 @@ The library was originally built for scraping & crawling and requires additional
  - persistence to file / remote 
  - map reduce operations (JavaScript)
 
-* For queues to work, Redis needs to be installed and configured
+*For queues to work, Redis needs to be installed and configured*
 
 ### Job instructions
 
