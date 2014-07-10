@@ -1,6 +1,7 @@
 package io.legs.specialized
 
 import io.legs.Specialization
+import io.legs.utils.UserAgents
 import org.openqa.selenium.remote.DesiredCapabilities
 import org.openqa.selenium.phantomjs.{PhantomJSDriverService, PhantomJSDriver}
 import scala.util.Failure
@@ -25,9 +26,10 @@ object WebDriver extends Specialization {
 			FileUtils.copyURLToFile(getClass.getResource("/phantomjs"), dstFile)
 		}
 
-    dstFile.setExecutable(true)
+		dstFile.setExecutable(true)
 
 		val capabilities = DesiredCapabilities.phantomjs()
+		capabilities.setCapability("phantomjs.page.settings.userAgent", UserAgents.getRandom )
 		capabilities.setCapability(PhantomJSDriverService.PHANTOMJS_EXECUTABLE_PATH_PROPERTY, executablePath)
 		val driver = new PhantomJSDriver(capabilities)
 		driver.get(url)

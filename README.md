@@ -10,6 +10,23 @@ scraping and job orchestration library
 
 Eliminate the cruft (boiler plate) and minimize time to completion of writing a scraper. Ideally only the business logic (moving parts) need to be written, all supporting machinery needs to be already in place and provide simple intuitive APIs
 
+### Installation
+
+`Legs.io` is published to Sonatype, so first make sure `SBT` is checking Sonatype for jars
+
+	resolvers += Resolver.sonatypeRepo("releases")
+
+Adding the dependecy to `build.sbt`
+
+	libraryDependencies += "io.legs" %% "legs" % "0.8.1"
+
+
+Currently I publish the project against Scala `2.11`, if `2.10.*` is required, please let me know
+
+### Changelog
+
+ * `0.8.1` add randomized user agent to PhantomJS
+
 ### Library contents
 
 The library was originally built for scraping & crawling and requires additional functionality other then simply downloading pages. Some additional machinery is provided to support an easy and effective tool 
