@@ -1,7 +1,7 @@
-import io.legs.Specialization.Yield
 import java.util.UUID
 
 import helpers.TestSpecializer
+import io.legs.Specialization.Yield
 import io.legs.{Specialization, Step}
 import org.scalatest.FunSpec
 import org.scalatest.concurrent.AsyncAssertions
@@ -10,7 +10,6 @@ import play.api.libs.json.{JsNumber, JsString}
 import scala.concurrent.Await
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
-import scala.util.{Failure, Success}
 
 class SpecializationSpec extends FunSpec with AsyncAssertions {
 
@@ -31,12 +30,7 @@ class SpecializationSpec extends FunSpec with AsyncAssertions {
 			Map("from" -> 20)
 		), Duration("5 seconds"))
 
-		res match {
-			case Success(Yield(outOpt)) =>
-				assertResult(21) { outOpt.get }
-			case Failure(e)=>
-				fail("Failure",e)
-		}
+		assertResult( Yield(Some(21)) ) { res }
 
 	}
 
@@ -46,12 +40,8 @@ class SpecializationSpec extends FunSpec with AsyncAssertions {
 			Map("from" -> 20)
 		), Duration("5 seconds"))
 
-		res match {
-			case Success(Yield(outOpt)) =>
-				assert(true)
-			case Failure(e)=>
-				fail("Failure",e)
-		}
+		assertResult( Yield(Some(21)) ) { res }
+
 	}
 
 	it("allows routes with just method names instead of full package path"){
@@ -59,10 +49,10 @@ class SpecializationSpec extends FunSpec with AsyncAssertions {
 			Step("GENERATE/start/end",None,None),
 			Map("start"-> JsNumber(20),"end"->JsNumber(22))
 		),Duration("5 seconds")) match {
-			case Success(Yield(result)) =>
+			case Yield(result) =>
 				assertResult(result){ Some(List(20, 21)) }
-			case Failure(e)=>
-				fail("Failure",e)
+			case bad =>
+				fail("bad result")
 		}
 	}
 

@@ -1,25 +1,22 @@
 package io.legs
 
-import scala.concurrent._
-import scala.util.Try
-import scala.async.Async.{async, await}
-import scala.concurrent.duration.Duration
-import akka.actor.{Props, ActorRef, Actor}
-import io.legs.scheduling.{JobType, Job}
-import io.legs.utils.InstructionsFileResolver
-import io.legs.specialized.Queue
-import io.legs.Coordinator.JobFailed
-import scala.util.Failure
-import scala.Some
-import io.legs.Coordinator.JobSuccess
-import scala.util.Success
 import java.util.logging.{Level, Logger}
+
+import akka.actor.{Actor, ActorRef, Props}
+import io.legs.Coordinator.{JobFailed, JobSuccess}
 import io.legs.Specialization.{RoutableFuture, Yield}
+import io.legs.scheduling.{Job, JobType}
+import io.legs.specialized.Queue
+import io.legs.utils.InstructionsFileResolver
+
+import scala.concurrent._
+import scala.concurrent.duration.Duration
+import scala.util.{Failure, Success, Try}
 
 
 class Worker(coordinator: ActorRef, job: Job) extends Actor {
 
-	import Worker._
+	import io.legs.Worker._
 
 	def receive  = {
 		case StartWork => startWork()
@@ -80,7 +77,7 @@ object Worker {
 		val steps = Step.from(jsonString)
 
 		try {
-			Await.result(walk(steps, state),Duration("5 minutes"))
+			Success(Await.result(walk(steps, state),Duration("5 minutes")))
 		} catch {
 			case e : TimeoutException => Failure(new Throwable("time ran out while working",e))
 			case e : Exception => Failure(e)
@@ -92,20 +89,19 @@ object Worker {
 		lazy val stateAndYield = yielded ++ state
 	}
 
-	def walk(steps:List[Step],state:Map[String,Any] = Map()) : RoutableFuture = async {
+	def walk(steps:List[Step],state:Map[String,Any] = Map()) : RoutableFuture =
 		steps match {
 			case x::xs =>
-				await(Specialization.executeStep(x,state)) match {
-					case Success(v) =>
-						if (xs.isEmpty) Success(v)
+				Specialization.executeStep(x,state).flatMap {
+					case yielded =>
+						if (xs.isEmpty) Future.successful(yielded)
 						else {
-							val recState = if (x.yields.isDefined && v.valueOpt.isDefined) state + (x.yields.get -> v.valueOpt.get) else state
-							await(walk(xs,recState))
+							val recState = if (x.yields.isDefined && yielded.valueOpt.isDefined) state + (x.yields.get -> yielded.valueOpt.get) else state
+							walk(xs,recState)
 						}
-					case Failure(e) => Failure(e)
 				}
-			case Nil => Success(Yield(None))
+			case Nil => Future.successful(Yield(None))
 		}
-	}
+
 
 }

@@ -1,11 +1,12 @@
 package io.legs.specialized
 
-import io.legs.Specialization
-import javax.script.{Invocable, ScriptEngineManager}
-import scala.util.{Failure, Success}
-import scala.concurrent._
 import java.util.logging.{Level, Logger}
-import io.legs.Specialization.{Yield, RoutableFuture}
+import javax.script.{Invocable, ScriptEngineManager}
+
+import io.legs.Specialization
+import io.legs.Specialization.{RoutableFuture, Yield}
+
+import scala.concurrent._
 
 object MapReduce extends Specialization {
 
@@ -14,7 +15,7 @@ object MapReduce extends Specialization {
 	type EmitMap = scala.collection.mutable.HashMap[String,List[Any]]
 
 	def MAP_REDUCE(state: Specialization.State, collection : List[Any], map : String, reduce : String)(implicit ctx : ExecutionContext) : RoutableFuture  =
-		future {
+		Future {
 
 			val mapperEngine = new ScriptEngineManager(null).getEngineByName("nashorn")
 
@@ -38,12 +39,11 @@ object MapReduce extends Specialization {
 					case ((k,values)) =>
 						(k,reducer.invokeFunction("reduce",k,values))
 				}
-
-				Success(Yield(Some(reduced)))
+				Yield(Some(reduced))
 			} catch {
 				case e : Throwable =>
 					logger.log(Level.SEVERE,"error while running map reduce",e)
-					Failure(e)
+					throw e
 			}
 		}
 

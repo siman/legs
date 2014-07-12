@@ -1,10 +1,10 @@
 package helpers
 
 import io.legs.Specialization
-import scala.util.Success
 import io.legs.Specialization.{RoutableFuture, Yield}
-import scala.concurrent.Future
+
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 object TestSpecializer extends Specialization {
 
@@ -23,21 +23,24 @@ object TestSpecializer extends Specialization {
 		counter.getOrElse(key, 0)
 
 	def get(state: Specialization.State,key:String) : RoutableFuture =
-		Future.successful(Success(Yield(Some(getKeyValue(key)))))
+		Future.successful(Yield(Some(getKeyValue(key))))
 
 	def incr(state: Specialization.State, key: String) : RoutableFuture =
 		synchronized {
 			counter.update(key, counter.getOrElseUpdate(key, 0) + 1)
-			Future(Success(Yield(Some(counter.get(key)))))
+			Future(Yield(Some(counter.get(key))))
 		}
 
 
 	def echo(state:Specialization.State,value:Any) : RoutableFuture =
-			Future(Success(Yield(Some(value))))
+			Future(Yield(Some(value)))
 
 
 
 	def incrState(state: Specialization.State, value: Int) : RoutableFuture =
-		Future(Success(Yield(Some(value + 1))))
+	{
+		println(value)
+		Future(Yield(Some(value + 1)))
+	}
 
 }

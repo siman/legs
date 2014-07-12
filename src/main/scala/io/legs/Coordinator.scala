@@ -1,19 +1,19 @@
 package io.legs
 
-import akka.actor._
-import scala.concurrent.duration._
-import io.legs.specialized.Queue
-import scala.Some
-import io.legs.scheduling.Job
-import io.legs.Worker.StartWork
-import scala.concurrent.ExecutionContext
-import ExecutionContext.Implicits.global
-import io.legs.Coordinator.{Stop, JobSuccess, JobFailed, GetStats}
 import java.util.logging.{Level, Logger}
+
+import akka.actor._
+import io.legs.Coordinator.{GetStats, JobFailed, JobSuccess, Stop}
+import io.legs.Worker.StartWork
+import io.legs.scheduling.Job
+import io.legs.specialized.Queue
+
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration._
 
 class Coordinator(labels: List[String], numMaxWorkers: Int) extends Actor {
 
-	import Coordinator.logger
+	import io.legs.Coordinator.logger
 
 	var statistics = CoordinatorStatistics()
 

@@ -1,17 +1,18 @@
 package io.legs.specialized
 
-import io.legs.Specialization
-import scala.util.{Failure, Success}
-import io.legs.scheduling.{JobStatus, Priority, JobType, Job}
-import io.legs.utils.{JsonFriend, EnumJson, RedisProvider}
-import play.api.libs.json.{JsString, Json}
-import org.joda.time.{DateTimeZone, DateTime}
-import redis.protocol.{RedisReply, Bulk}
-import redis.api.scripting.RedisScript
 import java.util.logging.{Level, Logger}
-import io.legs.Specialization.{RoutableFuture, Yield}
-import scala.concurrent._
+
 import com.uniformlyrandom.scron.Scron
+import io.legs.Specialization
+import io.legs.Specialization.{RoutableFuture, Yield}
+import io.legs.scheduling.{Job, JobStatus, JobType, Priority}
+import io.legs.utils.{EnumJson, JsonFriend, RedisProvider}
+import org.joda.time.{DateTime, DateTimeZone}
+import play.api.libs.json.{JsString, Json}
+import redis.api.scripting.RedisScript
+import redis.protocol.{Bulk, RedisReply}
+
+import scala.concurrent._
 
 object Queue extends Specialization {
 
@@ -28,7 +29,7 @@ object Queue extends Specialization {
 	final val queueWorkingByLabelPrefix_ZL = "legs:queue:working:label:"
 	final def queueWorkingByLabelKey_ZL(label:String) = s"$queueWorkingByLabelPrefix_ZL$label"
 	final val queueDeferredByLabelPrefix_ZL = "legs:queue:deferred:label:"
-	final def queueDeferredByLabelKey_ZL(label:String) = s"$queueDeferredByLabelPrefix_ZL$label" 
+	final def queueDeferredByLabelKey_ZL(label:String) = s"$queueDeferredByLabelPrefix_ZL$label"
 
 	private val planAheadHours = 2
 	val jobsStartValue = "1000"
@@ -76,11 +77,11 @@ object Queue extends Specialization {
 
 	def getJob(id: String) : Option[Job] =
 		RedisProvider.blocking
-			{ _.hget[String](jobsData_HS,id) } match {
-				case Some(jobString) =>
-					Json.parse(jobString).asOpt[Job]
-				case None => None
-			}
+		{ _.hget[String](jobsData_HS,id) } match {
+			case Some(jobString) =>
+				Json.parse(jobString).asOpt[Job]
+			case None => None
+		}
 
 	def deleteJob(job: Job) {
 
@@ -100,7 +101,7 @@ object Queue extends Specialization {
 
 
 	}
-	
+
 	private def getScheduleForJob(id : String) : Option[String] =
 		RedisProvider.blocking {
 			_.hget[String](schedulePlansKey_HS, id)
@@ -202,12 +203,13 @@ object Queue extends Specialization {
 		}
 	}
 
-	def ADD_JOB(state: Specialization.State, instructions: String, description:String, labels: List[JsString], inputIndices:List[JsString])(implicit ctx : ExecutionContext) : RoutableFuture = future {
+	def ADD_JOB(state: Specialization.State, instructions: String, description:String, labels: List[JsString], inputIndices:List[JsString])(implicit ctx : ExecutionContext) : RoutableFuture =
+		Future {
 
 			val inputKeys =  inputIndices.map(_.value)
-			if (!inputKeys.filterNot(i=>state.keys.exists(i.equals)).isEmpty){
-				Failure(new Exception("could not find all input values in state, missing:"
-						+ inputKeys.filterNot(i=>state.keys.exists(i.equals)).mkString(",") ))
+			if (inputKeys.filterNot(i => state.keys.exists(i.equals)).nonEmpty){
+				throw new Exception("could not find all input values in state, missing:"
+						+ inputKeys.filterNot(i=>state.keys.exists(i.equals)).mkString(",") )
 			} else {
 				val inputs = inputKeys.zip(inputKeys.map(iName=> JsonFriend.jsonify(state(iName)))).toMap
 
@@ -223,20 +225,21 @@ object Queue extends Specialization {
 
 				persistJob(job)
 				persistJobQueue(job,DateTime.now(DateTimeZone.UTC).getMillis)
-				Success(Yield(None))
+				Yield(None)
 			}
-	}
+		}
 
 	private def writeJobPlan(jobId:String, schedule:String) = {
 		logger.info(s"planning jobId:$jobId with schedule: $schedule")
 		RedisProvider.redisPool.hset(schedulePlansKey_HS, jobId, schedule)
 	}
 
-	def PLAN(state: Specialization.State, schedule: String, jobId: String)(implicit ctx : ExecutionContext) : RoutableFuture = future {
-		blocking { writeJobPlan(jobId, schedule) }
-		Success(Yield(None))
-	}
-	
+	def PLAN(state: Specialization.State, schedule: String, jobId: String)(implicit ctx : ExecutionContext) : RoutableFuture =
+		Future {
+			blocking { writeJobPlan(jobId, schedule) }
+			Yield(None)
+		}
+
 	private def queueAScheduleJob(job:Job,schedule:String) {
 		val startTimeMS = job.lastRunTime.getOrElse(DateTime.now(DateTimeZone.UTC).getMillis)
 		val endTimeMS = DateTime.now(DateTimeZone.UTC).plusHours(planAheadHours).getMillis
@@ -252,25 +255,26 @@ object Queue extends Specialization {
 		logger.info(s"done queueing job ID:${job.id}")
 	}
 
-	def QUEUE(state: Specialization.State, jobId : String)(implicit ctx : ExecutionContext) : RoutableFuture = future {
-		val jobOpt = getJob(jobId)
-		val jobSchedule = getScheduleForJob(jobId)
-		if (jobOpt.isEmpty) Failure(new Exception("could not find job for ID" + jobId))
-		else if (jobSchedule.isEmpty) Failure(new Exception("could not find schedule for job ID" + jobId))
-		else {
-			val job = jobOpt.get.touch
-      blocking {
-        persistJob(job)
-        queueAScheduleJob(job,jobSchedule.get)
-      }
-      Success(Yield(None))
+	def QUEUE(state: Specialization.State, jobId : String)(implicit ctx : ExecutionContext) : RoutableFuture =
+		Future {
+			val jobOpt = getJob(jobId)
+			val jobSchedule = getScheduleForJob(jobId)
+			if (jobOpt.isEmpty) throw new Exception("could not find job for ID" + jobId)
+			else if (jobSchedule.isEmpty) throw new Exception("could not find schedule for job ID" + jobId)
+			else {
+				val job = jobOpt.get.touch
+				blocking {
+					persistJob(job)
+					queueAScheduleJob(job,jobSchedule.get)
+				}
+				Yield(None)
+			}
 		}
-	}
 
 	def queueAll(){
 		logger.info("queueing all scheduled jobs")
 		val scheduledJobs = getAllScheduledJobs
-		if (!scheduledJobs.isEmpty){
+		if (scheduledJobs.nonEmpty){
 			scheduledJobs.keys.foreach { jobId =>
 				val jobOpt = getJob(jobId)
 				jobOpt match {
@@ -285,9 +289,10 @@ object Queue extends Specialization {
 		}
 	}
 
-	def QUEUE_ALL(state: Specialization.State)(implicit ctx : ExecutionContext) : RoutableFuture = future {
-		queueAll()
-		Success(Yield(None))
-	}
+	def QUEUE_ALL(state: Specialization.State)(implicit ctx : ExecutionContext) : RoutableFuture =
+		Future {
+			queueAll()
+			Yield(None)
+		}
 
 }

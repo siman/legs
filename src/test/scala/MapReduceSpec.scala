@@ -39,7 +39,7 @@ class MapReduceSpec extends FunSpec {
 		val f = MapReduce.invokeAction("MAP_REDUCE",List("collection","map","reduce"),Map("collection" -> collection)
 			,Map("map" -> map, "reduce" -> reduce))
 
-		assertResult(Success(Yield(Some(Map("items" -> "four,three,two,one", "counts" -> 4))))){
+		assertResult(Yield(Some(Map("items" -> "four,three,two,one", "counts" -> 4)))){
 			Await.result(f, Duration("2 second"))
 		}
 

@@ -1,10 +1,10 @@
 package io.legs.specialized
 
 import io.legs.Specialization
-import io.legs.utils.RedisProvider
-import scala.util.Success
-import scala.concurrent._
 import io.legs.Specialization.{RoutableFuture, Yield}
+import io.legs.utils.RedisProvider
+
+import scala.concurrent._
 
 object LinkTracker extends Specialization {
 
@@ -21,8 +21,8 @@ object LinkTracker extends Specialization {
 
 
 	def CHECK_EXIST_CREATE(state: Specialization.State, domain : String, uri: String)(implicit ctx : ExecutionContext) : RoutableFuture =
-		future {
-			Success(Yield(Some(checkExistCreate(domain, uri))))
+		Future {
+			Yield(Some(checkExistCreate(domain, uri)))
 		}
 
 }

@@ -1,14 +1,13 @@
 import io.legs.Specialization
 import io.legs.Specialization.Yield
-import org.scalatest.concurrent.AsyncAssertions
-import org.scalatest.{ParallelTestExecution, FunSpec}
-import org.scalamock.scalatest.MockFactory
-
-import io.legs.specialized.{SimpleScraper, Scraper}
 import io.legs.network.Communicator
+import io.legs.specialized.{Scraper, SimpleScraper}
+import org.scalamock.scalatest.MockFactory
+import org.scalatest.concurrent.AsyncAssertions
+import org.scalatest.{FunSpec, ParallelTestExecution}
 import play.api.libs.json.JsString
+
 import scala.concurrent.Await
-import scala.util.{Failure, Success}
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class ScraperSpec extends FunSpec with MockFactory with AsyncAssertions with ParallelTestExecution {
@@ -42,12 +41,7 @@ class ScraperSpec extends FunSpec with MockFactory with AsyncAssertions with Par
 
 		val result = Await.result(actionRes, Specialization.oneMinuteDuration)
 
-		result match {
-			case Success(Yield(outOpt)) =>
-				assertResult( data1 ) { outOpt.get }
-			case Failure(e)=>
-				fail("Failure",e)
-		}
+		assertResult( Yield(Some(data1)) ) { result }
 
 	}
 
@@ -66,17 +60,13 @@ class ScraperSpec extends FunSpec with MockFactory with AsyncAssertions with Par
 			Map("dataStr"->JsString(html1), "selector" -> JsString("p") ,"validator"->JsString("") ))
 
 		val result = Await.result(actionFuture, Specialization.tenSecDuration)
+		assertResult( Yield(Some(List(data1))) ) { result }
 
-		result match {
-			case Success(Yield(outOpt)) =>
-				assertResult( List(data1)) { outOpt.get}
-			case Failure(e)=>
-				fail("Failure",e)
-		}
 
 	}
 
 	it("catches a badly formatted selector and returns an error"){
+
 		val tcm = mock[Communicator]
 
 		object Obj extends Scraper {
@@ -87,14 +77,11 @@ class ScraperSpec extends FunSpec with MockFactory with AsyncAssertions with Par
 			List("dataStr","selector","validator"),Map(),
 			Map("dataStr"-> JsString(html1), "selector" -> JsString("!@#p") ,"validator"->JsString("") ))
 
-		val result = Await.result(actionFuture, Specialization.tenSecDuration)
-
-		result match {
-			case Success(Yield(outOpt)) =>
-				fail("Failure",new Exception())
-			case Failure(e)=>
-				assert(true)
-
+		try {
+			val result = Await.result(actionFuture, Specialization.tenSecDuration)
+			throw new Throwable("not good!")
+		} catch {
+			case e : Throwable => // good, nothing to do here
 		}
 
 	}
@@ -111,13 +98,8 @@ class ScraperSpec extends FunSpec with MockFactory with AsyncAssertions with Par
 			Map("dataStr"->JsString(html1), "selector"-> JsString("//p"), "validator"-> JsString("")))
 
 		val result = Await.result(actionFuture, Specialization.tenSecDuration)
+		assertResult( Yield(Some(List(data1))) ) { result }
 
-		result match {
-			case Success(Yield(outOpt)) =>
-				assertResult( List(data1)) { outOpt.get}
-			case Failure(e)=>
-				fail("Failure",e)
-		}
 	}
 
 	it("extracts nodes from XML"){
@@ -125,10 +107,8 @@ class ScraperSpec extends FunSpec with MockFactory with AsyncAssertions with Par
 		val resFuture = SimpleScraper.invokeAction("EXTRACT_XML_XPATH",List("input","selector","validator"),Map(),
 			Map("input"->JsString(inputFileStr),"selector" -> JsString("//_links"), "validator" -> JsString("")))
 
-		Await.result(resFuture,Specialization.tenSecDuration) match {
-			case Success(Yield(outOpt)) =>
-				assertResult(4) {  outOpt.get.asInstanceOf[List[String]].length }
-			case Failure(e)=> println(e)
+		assertResult(4) {
+			Await.result(resFuture,Specialization.tenSecDuration).valueOpt.get.asInstanceOf[List[String]].length
 		}
 
 	}
@@ -139,12 +119,8 @@ class ScraperSpec extends FunSpec with MockFactory with AsyncAssertions with Par
 		val resFuture = SimpleScraper.invokeAction("EXTRACT_XML_XPATH",List("input","selector","validator"),Map(),
 			Map("input"->JsString(inputXml),"selector" -> JsString("//_links"), "validator" -> JsString("")))
 
-		Await.result(resFuture,Specialization.tenSecDuration) match {
-			case Success(Yield(outOpt)) =>
-				assertResult(1) {  outOpt.get.asInstanceOf[List[String]].length }
-			case Failure(e)=>
-				e.printStackTrace()
-				fail(e)
+		assertResult(1) {
+			Await.result(resFuture,Specialization.tenSecDuration).valueOpt.get.asInstanceOf[List[String]].length
 		}
 
 	}

@@ -1,7 +1,7 @@
 package io.legs.specialized
 
 import java.io.StringReader
-import java.util.logging.{Level, Logger}
+import java.util.logging.Logger
 import javax.xml.transform.stream.StreamSource
 
 import io.legs.Specialization
@@ -15,7 +15,6 @@ import org.jsoup.nodes.Element
 
 import scala.collection.immutable.::
 import scala.concurrent._
-import scala.util.{Failure, Success}
 
 
 object SimpleScraper extends Scraper {
@@ -29,23 +28,17 @@ trait Scraper extends Specialization {
 
 	def communicator: Communicator
 
-	def FETCH(state: Specialization.State, url:String)(implicit ctx : ExecutionContext) : RoutableFuture = future {
-
-		val res = communicator.getHtmlStr(url)
-		Success(Yield(Some(res)))
-
-	}
-
-	def FETCH_RAW(state: Specialization.State, url:String)(implicit ctx : ExecutionContext) : RoutableFuture = future {
-		try {
-			val res = communicator.getUrlStr(url)
-			Success(Yield(Some(res)))
-		} catch {
-			case e: Exception =>
-				logger.log(Level.SEVERE,s"error while trying to fetch url $url",e)
-				Failure(new Throwable(s"error while trying to fetch url $url",e))
+	def FETCH(state: Specialization.State, url:String)(implicit ctx : ExecutionContext) : RoutableFuture =
+		Future {
+			val res = communicator.getHtmlStr(url)
+			Yield(Some(res))
 		}
-	}
+
+	def FETCH_RAW(state: Specialization.State, url:String)(implicit ctx : ExecutionContext) : RoutableFuture =
+		Future {
+			val res = communicator.getUrlStr(url)
+			Yield(Some(res))
+		}
 
 
 	/*
@@ -53,25 +46,22 @@ trait Scraper extends Specialization {
 	* docs - http://jsoup.org/cookbook/extracting-data/selector-syntax
 	* playground - http://try.jsoup.org/
 	* */
-	def EXTRACT_JSOUP(state: Specialization.State, inputString: String, selector: String, validator: String )(implicit ctx : ExecutionContext) : RoutableFuture = future {
-		val parsed = Jsoup.parse(inputString)
-		try {
+	def EXTRACT_JSOUP(state: Specialization.State, inputString: String, selector: String, validator: String )(implicit ctx : ExecutionContext) : RoutableFuture =
+		Future {
+			val parsed = Jsoup.parse(inputString)
+
 			val resArr = parsed.select(selector).toArray
 			val returns = resArr.map(_.asInstanceOf[Element].text()).toList
-			Success(Yield(Some(returns)))
-		} catch {
-			case e:Exception =>
-				Failure(e)
+			Yield(Some(returns))
+
 		}
 
-	}
 
-
-	def EXTRACT_XML_XPATH(state: Specialization.State, inputString: String, selector: String, validator: String ) : RoutableFuture =
-		try {
+	def EXTRACT_XML_XPATH(state: Specialization.State, inputString: String, selector: String, validator: String )(implicit ctx : ExecutionContext) : RoutableFuture =
+		Future {
 			val processor = new Processor(false)
-			val cleanInput = inputString.replace('&',' ')
-			val doc = processor.newDocumentBuilder().build( new StreamSource( new StringReader(cleanInput) ) )
+			val cleanInput = inputString.replace('&', ' ')
+			val doc = processor.newDocumentBuilder().build(new StreamSource(new StringReader(cleanInput)))
 			val xpCompiler = processor.newXPathCompiler()
 			val xpath = xpCompiler.compile(selector)
 			val loaded = xpath.load()
@@ -81,11 +71,9 @@ trait Scraper extends Specialization {
 			import scala.collection.JavaConverters._
 			val foundItems = evaluated.iterator.asScala.map(_.getStringValue).toList
 
-			Future.successful(Success(Yield(Some(foundItems))))
-		} catch {
-			case e: Exception =>
-				Future.failed(e)
+			Yield(Some(foundItems))
 		}
+
 
 
 
@@ -95,7 +83,7 @@ trait Scraper extends Specialization {
 	* http://www.saxonica.com/documentation/#!expressions
 	* */
 	def EXTRACT_HTML_XPATH(state: Specialization.State, inputString: String, selector: String, validator: String )(implicit ctx : ExecutionContext) : RoutableFuture =
-		try {
+		Future {
 
 			val cleaner = new HtmlCleaner()
 			val properties = cleaner.getProperties
@@ -115,16 +103,13 @@ trait Scraper extends Specialization {
 			import scala.collection.JavaConverters._
 			val foundItems = evaluated.iterator.asScala.map(_.getStringValue).toList
 
-			Future.successful(Success(Yield(Some(foundItems))))
-
-		} catch {
-			case e: Exception =>
-				Future.failed(e)
+			Yield(Some(foundItems))
 		}
+
 
 	def EXTRACT_HTML_XPATH_FIRST(state: Specialization.State, inputString: String, selector: String, validator: String )(implicit ctx : ExecutionContext) : RoutableFuture =
 		EXTRACT_HTML_XPATH(state,inputString,selector,validator).map {
-			case Success(Yield(Some(x::xs))) => Success(Yield(Some(x)))
+			case Yield(Some(x::xs)) => Yield(Some(x))
 			case whatever => whatever
 		}
 

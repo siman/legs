@@ -6,9 +6,8 @@ import io.legs.specialized._
 import io.legs.utils.JsonFriend
 import play.api.libs.json.JsValue
 
-import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.duration.Duration
-import scala.util.{Failure, Try}
+import scala.concurrent.{ExecutionContext, Future}
 
 
 trait Specialization {
@@ -53,17 +52,18 @@ trait Specialization {
 					} catch {
 						case e:Exception =>
 							spcializationLogger.log(Level.SEVERE,s"failing invocation of:$name",e)
-							Future(Failure(new Throwable(s"failing invocation of:$name",e)))
+							Future.failed(new Throwable(s"failing invocation of:$name",e))
+
 					}
 				} else {
 					val msg = s"could not locate some parameters in state:${Specialization.getMissingParameters(paramNames, paramResolver).mkString(",")}"
 					spcializationLogger.log(Level.SEVERE,msg)
-					Future(Failure(new Throwable(msg)))
+					Future.failed(new Throwable(msg))
 				}
 
 			case None =>
 				spcializationLogger.log(Level.SEVERE,s"could not find method $name")
-				Future(Failure(new Throwable(s"could not find method $name")))
+				Future.failed(new Throwable(s"could not find method $name"))
 		}
 
 	}
@@ -74,7 +74,7 @@ object Specialization {
 	case class Yield(valueOpt:Option[Any])
 
 	type State = Map[String,Any]
-	type RoutableFuture = Future[Try[Yield]]
+	type RoutableFuture = Future[Yield]
 
 	implicit val pool = ExecutionContext.fromExecutor(new scala.concurrent.forkjoin.ForkJoinPool)
 
@@ -114,7 +114,7 @@ object Specialization {
 				case specInstance: Specialization =>
 					specInstance.invokeAction(specializedAction, paramNames, state, step.values.getOrElse(Map()))
 				case _ =>
-					Future(Failure(new Exception(s"The class $specializedClass is not extending 'Specialization' ")))
+					Future.failed(new Exception(s"The class $specializedClass is not extending 'Specialization' "))
 			}
 
 		} catch {
@@ -134,7 +134,7 @@ object Specialization {
 	private def resolveParamValues(paramNames: List[String], state: State) : List[Any] =
 		paramNames.map(p=>state.get(p).get).toList
 
-	private def placeholder : RoutableFuture = Future(Failure(new Throwable("should not be run")))
+	private def placeholder : RoutableFuture = Future.failed(new Throwable("should not be run"))
 	private val compareType = getClass.getDeclaredMethods.find( _.getName == "placeholder" ).get.getGenericReturnType
 
 
