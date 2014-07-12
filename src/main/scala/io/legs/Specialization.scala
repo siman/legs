@@ -52,7 +52,7 @@ trait Specialization {
 						route._3.invoke(this, params.toSeq.asInstanceOf[Seq[Object]] : _* ).asInstanceOf[RoutableFuture]
 					} catch {
 						case e:Exception =>
-							spcializationLogger.log(Level.SEVERE,"failing invocation of:$name",e)
+							spcializationLogger.log(Level.SEVERE,s"failing invocation of:$name",e)
 							Future(Failure(new Throwable(s"failing invocation of:$name",e)))
 					}
 				} else {
