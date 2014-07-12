@@ -206,6 +206,13 @@ Misc
 |x1|`JsArray[String]`|array of keys of values to persist (simple concat of values)|
 |x2|`String`|path for where to store the file|
 
+
+##### `VERIFY_VALUES/x1` verify values exist in the state (by name), fail job if not found
+
+|parameter|type|description|
+|:--------|:--:|:----------|
+|x1|`JsArray[String]`|name of parameters to check for existence in the state|
+
 Map-Reduce
 ----
 
@@ -225,3 +232,4 @@ Map-Reduce
 |x1|`Map`|some map|
 |x2|`String`|map key to get|
 |yields|`Any`|the value for that key|
+
