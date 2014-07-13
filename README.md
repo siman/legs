@@ -26,6 +26,8 @@ Currently I publish the project against Scala `2.11`, if `2.10.*` is required, p
 ### Changelog
 
  * `0.8.1` add randomized user agent to PhantomJS
+ * `0.8.2` improve logging + docs
+ * `0.8.3` refactor signature of `RoutableFuture` to `Future[T]` instead of `Future[Try[T]]`
 
 ### Library contents
 
