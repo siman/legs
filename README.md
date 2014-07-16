@@ -18,7 +18,7 @@ Eliminate the cruft (boiler plate) and minimize time to completion of writing a 
 
 Adding the dependecy to `build.sbt`
 
-	libraryDependencies += "io.legs" %% "legs" % "0.8.1"
+	libraryDependencies += "io.legs" %% "legs" % "0.8.3"
 
 
 Currently I publish the project against Scala `2.11`, if `2.10.*` is required, please let me know
@@ -223,7 +223,7 @@ Map-Reduce
 |parameter|type|description|
 |:--------|:--:|:----------|
 |x1|`List`|a collection of some values to map on|
-|x2|`String`|JSON escaped Javascript snippet with a `map` function which calls `emitter.emit(key,value`|
+|x2|`String`|JSON escaped Javascript snippet with a `map` function which calls `emitter.emit(key,value)`|
 |x2|`String`|JSON escaped Javascript snippet with a `reduce` function which reduces values per every key in the map stage|
 |yields|`Map[String,Any]`|result of map and reduce|
 
