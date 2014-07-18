@@ -42,16 +42,18 @@ trait Specialization {
 							case false=> JsonFriend.materialize(paramResolver.get(expType._2).get)::args
 						}
 					}
+					val params =
+						if (route._2.last == classOf[ExecutionContext])
+							state :: resolvedArgs ::: List(ctx)
+						else
+							state :: resolvedArgs
 					try {
-						val params =
-							if (route._2.last == classOf[ExecutionContext])
-								state :: resolvedArgs ::: List(ctx)
-							else
-								state :: resolvedArgs
 						route._3.invoke(this, params.toSeq.asInstanceOf[Seq[Object]] : _* ).asInstanceOf[RoutableFuture]
 					} catch {
 						case e:Exception =>
 							spcializationLogger.log(Level.SEVERE,s"failing invocation of:$name",e)
+							println("resolved params")
+							println(params)
 							Future.failed(new Throwable(s"failing invocation of:$name",e))
 
 					}
