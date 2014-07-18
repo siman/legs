@@ -4,9 +4,14 @@ import java.util.logging.Logger
 
 import io.legs.Specialization.{RoutableFuture, Yield}
 import io.legs._
-import play.api.libs.json.{JsArray, JsString}
+import play.api.libs.json._
 
 import scala.concurrent.{ExecutionContext, Future}
+import io.legs.Specialization.Yield
+import play.api.libs.json.JsArray
+import play.api.libs.json.JsString
+import scala.Some
+import play.api.libs.json.JsNumber
 
 /**
  * Created: 6/11/13 4:53 PM
@@ -86,6 +91,29 @@ object Tools extends Specialization {
 			case true => Future.successful(Yield(None))
 			case false => Future.failed(new Throwable("could not verify all values, missing: " + values.filterNot(state.keys.toList.contains).mkString(",") ))
 		}
+
+	def AS_JSON(state:Specialization.State, keys : List[JsString])(implicit ctx : ExecutionContext) : RoutableFuture =
+		Future {
+			Yield(Some(constructJson(state,keys)))
+		}
+
+	def constructJson(state:Specialization.State, keys : List[JsString]) : String =
+		Json.toJson(keys.foldLeft(Map.empty[String, JsValue]) {
+			(_out, key) =>
+				state.get(key.value) match {
+					case Some(v: List[Any]) =>
+						_out + (key.value -> JsArray(
+							v.map {
+								case x: Int => JsNumber(BigDecimal(x))
+								case x: String => JsString(x)
+								case x => JsString(x.toString)
+							}
+						))
+					case Some(v: String) => _out + (key.value -> JsString(v))
+					case Some(v: Integer) => _out + (key.value -> JsNumber(BigDecimal(v)))
+					case ignore => _out
+				}
+		}).toString()
 
 
 }

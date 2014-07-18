@@ -18,7 +18,7 @@ Eliminate the cruft (boiler plate) and minimize time to completion of writing a 
 
 Adding the dependecy to `build.sbt`
 
-	libraryDependencies += "io.legs" %% "legs" % "0.8.1"
+	libraryDependencies += "io.legs" %% "legs" % "0.8.3.1"
 
 
 Currently I publish the project against Scala `2.11`, if `2.10.*` is required, please let me know
@@ -28,6 +28,7 @@ Currently I publish the project against Scala `2.11`, if `2.10.*` is required, p
  * `0.8.1` add randomized user agent to PhantomJS
  * `0.8.2` improve logging + docs
  * `0.8.3` refactor signature of `RoutableFuture` to `Future[T]` instead of `Future[Try[T]]`
+ * `0.8.3.1` add `AS_JSON` utility
 
 ### Library contents
 
@@ -207,6 +208,13 @@ Misc
 |:--------|:--:|:----------|
 |x1|`JsArray[String]`|array of keys of values to persist (simple concat of values)|
 |x2|`String`|path for where to store the file|
+
+
+##### `AS_JSON/x1` persist values file
+
+|parameter|type|description|
+|:--------|:--:|:----------|
+|x1|`JsArrau[String]`|array of keys to add as key value pair of a json object|
 
 
 ##### `VERIFY_VALUES/x1` verify values exist in the state (by name), fail job if not found

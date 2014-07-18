@@ -37,30 +37,13 @@ object Persistor extends Specialization {
 	def TO_FILE_AS_JSON(state: Specialization.State, keys : List[JsString], filePath: String)(implicit ctx : ExecutionContext) : RoutableFuture =
 		Future {
 
-			val out = keys.foldLeft(Map.empty[String,JsValue]) { (_out,key)=>
-				state.get(key.value) match {
-					case Some(v: List[Any]) =>
-						_out + (key.value -> JsArray(
-							v.map {
-								case x : Int => JsNumber(BigDecimal(x))
-								case x : String => JsString(x)
-								case x => JsString(x.toString)
-							}
-						))
-					case Some(v: String) => _out + (key.value -> JsString(v))
-					case Some(v: Integer) => _out + (key.value -> JsNumber(BigDecimal(v)))
-					case ignore => _out
-				}
+			WriteSyncObj.synchronized {
+				val writer = new FileWriter(filePath,true)
+				val objStr = Tools.constructJson(state, keys)
+				writer.write(objStr)
+				writer.close()
 			}
 
-			if (out.nonEmpty){
-				WriteSyncObj.synchronized {
-					val writer = new FileWriter(filePath,true)
-					val objStr = Json.toJson(out).toString()
-					writer.write(objStr)
-					writer.close()
-				}
-			}
 			Yield(None)
 
 		}
