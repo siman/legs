@@ -61,5 +61,24 @@ class WorkerSpec extends FunSpec with AsyncAssertions with Eventually {
 		}
 	}
 
+	it("further transforms a yielded value (when applicable)"){
+		val instructions =
+		"""
+		  |[{"action" : "helpers.TestSpecializer/echo/someValue",
+		  | "transform" : [
+		  |  { "action" : "TRIM/$v" }
+		  | ],
+		  | "yields" : "output"
+		  |}
+		  |]
+		""".stripMargin
+
+		Worker.execute(instructions, Map("someValue" -> " result ")) match {
+			case Success(v)=> assertResult(Some("result")) { v.valueOpt }
+			case Failure(e)=> fail (e)
+		}
+
+	}
+
 
 }

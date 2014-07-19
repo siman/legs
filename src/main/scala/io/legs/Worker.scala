@@ -93,10 +93,20 @@ object Worker {
 		steps match {
 			case x::xs =>
 				Specialization.executeStep(x,state).flatMap {
+					case Yield(Some(yielded)) if x.transform.isDefined =>
+						val transformSteps =
+							Step.from(x.transform.get) match {
+								case y::ys => y.copy(yields = Some("$v"))::ys
+								case ignore => ignore
+							}
+						walk(transformSteps, state + ("$v" -> yielded))
+					case dontCare => Future.successful(dontCare)
+				}.flatMap {
 					case yielded =>
 						if (xs.isEmpty) Future.successful(yielded)
 						else {
-							val recState = if (x.yields.isDefined && yielded.valueOpt.isDefined) state + (x.yields.get -> yielded.valueOpt.get) else state
+							val recState =
+								if (x.yields.isDefined && yielded.valueOpt.isDefined) state + (x.yields.get -> yielded.valueOpt.get) else state
 							walk(xs,recState)
 						}
 				}

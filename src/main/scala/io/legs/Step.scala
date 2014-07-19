@@ -10,7 +10,8 @@ import java.util.logging.{Level, Logger}
 case class Step (
 	action: String,
 	values: Option[Map[String,JsValue]],
-	yields: Option[String]
+	yields: Option[String],
+	transform : Option[JsArray] = None
 )
 
 object Step {
@@ -19,7 +20,7 @@ object Step {
 
 	val logger = Logger.getLogger(this.getClass.getSimpleName)
 
-	def from(jsonArray : JsArray ) : List[Step] =
+	def from(jsonArray : JsArray) : List[Step] =
 		jsonArray.value.toList.map(v=> fmt.reads(v).getOrElse(
 			Step("ECHO/message",
 				Some(Map("message" -> JsString("could not parse step from:" + v.toString() ))),None)

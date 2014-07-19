@@ -28,7 +28,7 @@ Currently I publish the project against Scala `2.11`, if `2.10.*` is required, p
  * `0.8.1` add randomized user agent to PhantomJS
  * `0.8.2` improve logging + docs
  * `0.8.3.*` refactoring internals, adding `AS_JSON`, some work around queues
-
+ * `0.8.4.*` experimental `transform` feature for every step of the chain
 ### Library contents
 
 The library was originally built for scraping & crawling and requires additional functionality other then simply downloading pages. Some additional machinery is provided to support an easy and effective tool 
