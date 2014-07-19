@@ -18,7 +18,7 @@ Eliminate the cruft (boiler plate) and minimize time to completion of writing a 
 
 Adding the dependecy to `build.sbt`
 
-	libraryDependencies += "io.legs" %% "legs" % "0.8.3.1"
+	libraryDependencies += "io.legs" %% "legs" % "0.8.3+"
 
 
 Currently I publish the project against Scala `2.11`, if `2.10.*` is required, please let me know
@@ -27,8 +27,7 @@ Currently I publish the project against Scala `2.11`, if `2.10.*` is required, p
 
  * `0.8.1` add randomized user agent to PhantomJS
  * `0.8.2` improve logging + docs
- * `0.8.3` refactor signature of `RoutableFuture` to `Future[T]` instead of `Future[Try[T]]`
- * `0.8.3.1` add `AS_JSON` utility
+ * `0.8.3.*` refactoring internals, adding `AS_JSON`, some work around queues
 
 ### Library contents
 
@@ -180,6 +179,16 @@ Queue/Jobs Operations
 |x2|`String`|job description|
 |x3|`JsArray[String]`|labels associated with job (`["label1","label2"]`)|
 |x4|`JsArray[String]`|list of parameters to be passed as input to job|
+|yields|`String`|the new job ID|
+
+
+##### `PLAN/x1/x2` add a job to the queue
+-----
+
+|parameter|type|description|
+|:--------|:--:|:----------|
+|x1|`String`|schedule (cron format (https://github.com/uniformlyrandom/scron)[scron])
+|x2|`String`|job ID|
 
 Misc
 ----

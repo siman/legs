@@ -110,6 +110,7 @@ trait Scraper extends Specialization {
 	def EXTRACT_HTML_XPATH_FIRST(state: Specialization.State, inputString: String, selector: String, validator: String )(implicit ctx : ExecutionContext) : RoutableFuture =
 		EXTRACT_HTML_XPATH(state,inputString,selector,validator).map {
 			case Yield(Some(x::xs)) => Yield(Some(x))
+			case Yield(None) | Yield(Some(Nil)) => Yield(Some(""))
 			case whatever => whatever
 		}
 

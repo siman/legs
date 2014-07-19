@@ -36,6 +36,7 @@ object Queue extends Specialization {
 
 	object Plans {
 		val oncePerHour = "0 0 * * * *"
+		val oncePer5Min = "0 0 * * * *"
 	}
 
 	val getSchedulerJob = Job(
@@ -213,6 +214,8 @@ object Queue extends Specialization {
 			} else {
 				val inputs = inputKeys.zip(inputKeys.map(iName=> JsonFriend.jsonify(state(iName)))).toMap
 
+				val newJobId = getNextJobId
+
 				val job = Job(
 					instructions,
 					labels.map(_.value),
@@ -220,12 +223,12 @@ object Queue extends Specialization {
 					description,
 					JobType.AD_HOC,
 					Priority.LOW,
-					getNextJobId
+					newJobId
 				)
 
 				persistJob(job)
 				persistJobQueue(job,DateTime.now(DateTimeZone.UTC).getMillis)
-				Yield(None)
+				Yield(Some(newJobId))
 			}
 		}
 

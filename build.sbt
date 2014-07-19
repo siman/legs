@@ -11,7 +11,7 @@ organization := "io.legs"
 
 name := "legs"
 
-version := "0.8.3.2"
+version := "0.8.3.4"
 
 scalaVersion := "2.11.0"
 
