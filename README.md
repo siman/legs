@@ -12,6 +12,8 @@ Eliminate the cruft (boiler plate) and minimize time to completion of writing a 
 
 ### Installation
 
+Java 8 "Nashorn" is used as the map-reduce engine, you will need to have Java 8 installed to use `Legs`.
+
 `Legs.io` is published to Sonatype, so first make sure `SBT` is checking Sonatype for jars
 
 	resolvers += Resolver.sonatypeRepo("releases")
