@@ -32,12 +32,12 @@ object Runner {
 	}
 
 	def main(args: Array[String]) {
-//		getMovies()
-		val foundOpt = InstructionsFileResolver.getFile("seret_movies")
-		Worker.execute(foundOpt.get) match {
-			case Success(v)=>
-				println(v)
-			case Failure(e)=> println(e)
-		}
+		getMovies()
+		//val foundOpt = InstructionsFileResolver.getFile("seret_movies")
+		//Worker.execute(foundOpt.get) match {
+		//	case Success(v)=>
+		//		println(v)
+		//	case Failure(e)=> println(e)
+		//}
 	}
 }
