@@ -72,15 +72,18 @@ object Worker {
 
 	def props(coordinator: ActorRef, job:Job) : Props = Props(new Worker(coordinator,job))
 
-	def execute(jsonString: String, state:Map[String,Any] = Map()): Try[Yield] = {
+	def execute(jsonString: String, state:Map[String,Any] = Map()): Try[Yield] =
+		 Try { Await.result(executeAsync(jsonString, state),Duration("5 minutes")) }
+
+	def executeAsync(jsonString: String, state:Map[String,Any] = Map()): Future[Yield] = {
 
 		val steps = Step.from(jsonString)
 
 		try {
-			Success(Await.result(walk(steps, state),Duration("5 minutes")))
+			walk(steps, state)
 		} catch {
-			case e : TimeoutException => Failure(new Throwable("time ran out while working",e))
-			case e : Exception => Failure(e)
+			case e : TimeoutException => throw new Throwable("time ran out while working",e)
+			case e : Exception => throw e
 		}
 
 	}

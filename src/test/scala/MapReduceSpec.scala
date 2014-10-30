@@ -40,7 +40,7 @@ class MapReduceSpec extends FunSpec {
 			,Map("map" -> map, "reduce" -> reduce))
 
 		assertResult(Yield(Some(Map("items" -> "four,three,two,one", "counts" -> 4)))){
-			Await.result(f, Duration("2 second"))
+			Await.result(f, Duration("10 second"))
 		}
 
 

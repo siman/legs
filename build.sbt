@@ -11,9 +11,9 @@ organization := "io.legs"
 
 name := "legs"
 
-version := "0.8.4.0"
+version := "0.8.4.1"
 
-scalaVersion := "2.11.0"
+scalaVersion := "2.11.2"
 
 licenses := Seq("MIT-style" -> url("http://opensource.org/licenses/mit-license.php"))
 
