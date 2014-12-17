@@ -19,7 +19,7 @@ object SimpleCommunicator extends Communicator {
 
 
 	def getHtmlStr(url: String): String = {
-		val doc = Jsoup.connect(url).userAgent(UserAgents.getRandom).timeout(10000).get()
+		val doc = Jsoup.connect(url).userAgent(UserAgents.getRandom).timeout(100000).get()
 		doc.outputSettings().escapeMode(EscapeMode.xhtml)
 		doc.toString
 	}

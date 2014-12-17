@@ -16,4 +16,5 @@ object Runner {
 			case Failure(e)=> println(e)
 		}
 	}
+
 }

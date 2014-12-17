@@ -11,7 +11,7 @@
 		"values" : {
 			"toParam":"number",
 			"nextSteps" : [{
-				"action" : "io.legs.specialized.Casts/CAST/number/toType",
+				"action" : "CAST/number/toType",
 				"values" :{
 					"toType" : "String"
 				},

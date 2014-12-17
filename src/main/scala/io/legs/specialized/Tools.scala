@@ -20,6 +20,14 @@ object Tools extends Specialization {
 
 	val specializedBaseLogger = Logger.getLogger(this.getClass.getSimpleName)
 
+	def CAST(state: Specialization.State, input: Any, toType:String)(implicit ctx : ExecutionContext) : RoutableFuture =
+		input match {
+			case _ : Int => toType match {
+				case "String" => Future.successful(Yield(Some(input.toString)))
+			}
+			case default => Future.successful(Yield(Some(input)))
+		}
+
 	def DEBUG(state:Specialization.State) : RoutableFuture = {
 		specializedBaseLogger.info("START dumping DEBUG information for state")
 		state.keys.map(k=> { specializedBaseLogger.info(s"key:'$k' value:'${state.get(k).head}' ") } )

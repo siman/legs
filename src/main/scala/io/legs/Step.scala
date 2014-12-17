@@ -31,7 +31,7 @@ object Step {
 			case v: JsArray => from(v)
 			case o: JsObject=> from(JsArray(Seq(o)))
 			case _=>
-        logger.log(Level.SEVERE,"bad value passed for json parsing, it can only be JsObject or JsArray:" + jsonString)
+				logger.log(Level.SEVERE,"bad value passed for json parsing, it can only be JsObject or JsArray:" + jsonString)
 				Nil
 		}
 

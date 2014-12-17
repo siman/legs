@@ -11,9 +11,9 @@ organization := "io.legs"
 
 name := "legs"
 
-version := "0.8.4.1"
+version := "0.8.4.3"
 
-scalaVersion := "2.11.2"
+scalaVersion := "2.11.4"
 
 licenses := Seq("MIT-style" -> url("http://opensource.org/licenses/mit-license.php"))
 
@@ -33,7 +33,7 @@ initialize := {
   // ... and then check the Java version.
   val specVersion = sys.props("java.specification.version")
   if (Set("1.5", "1.6", "1.7") contains specVersion)
-    sys.error("Java 8 or higher is required for this project.")
+    sys.error("Java 8 or higher is required for library legs.io")
 }
 
 fork in Test := true
@@ -51,15 +51,15 @@ libraryDependencies ++= Seq(
 	"net.sf.saxon" % "Saxon-HE" % "9.5.1-1",
 	"net.sourceforge.htmlcleaner" % "htmlcleaner" % "2.6.1",
 	"com.typesafe.akka" %% "akka-actor" % "2.3.3",
-	"com.typesafe.akka" %% "akka-testkit" % "2.3.3",
-	"org.scala-lang.modules" %% "scala-async" % "0.9.1",
+	"com.typesafe.akka" %% "akka-testkit" % "2.3.3" % "test",
 	"org.apache.httpcomponents" % "httpclient" % "4.3.2",
 	"org.apache.httpcomponents" % "httpcore" % "4.3.1",
 	"org.apache.tika" % "tika-core" % "1.4",
 	"org.apache.tika" % "tika-parsers" % "1.4",
 	"com.etaty.rediscala" %% "rediscala" % "1.3.1",
 	"com.uniformlyrandom" %% "scron" % "0.5.1",
-	"com.github.detro.ghostdriver" % "phantomjsdriver" % "1.1.0"
+	"com.github.detro.ghostdriver" % "phantomjsdriver" % "1.1.0",
+	"io.gatling" %% "jsonpath" % "0.6.2"
 )
 
 resolvers ++= Seq(
@@ -68,8 +68,6 @@ resolvers ++= Seq(
         "Typesafe repository" at "http://repo.typesafe.com/typesafe/releases/",
         "Typesafe Snapshots" at "http://repo.typesafe.com/typesafe/snapshots/",
         "Typesafe simple" at "http://repo.typesafe.com/typesafe/simple/maven-releases/",
-        "spray repo" at "http://repo.spray.io",
-        "spray nightlies repo" at "http://nightlies.spray.io",
         "rediscala" at "https://raw.github.com/etaty/rediscala-mvn/master/releases/"
 )
 
