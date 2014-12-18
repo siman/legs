@@ -45,7 +45,7 @@ resolvers += "Sonatype OSS releases" at "https://oss.sonatype.org/service/local/
 libraryDependencies ++= Seq(
 	"org.scalatest" %% "scalatest" % "2.2.0" % "test",
 	"org.scalamock" %% "scalamock-scalatest-support" % "3.1.1" % "test",
-	"org.scala-lang"% "scala-reflect"% "2.10.3",
+	"org.scala-lang"% "scala-reflect"% "2.11.4",
 	"org.jsoup" % "jsoup" % "1.7.2",
 	"com.typesafe.play"%% "play-json" % "2.3.1",
 	"net.sf.saxon" % "Saxon-HE" % "9.5.1-1",
