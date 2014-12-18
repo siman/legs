@@ -5,7 +5,7 @@ import java.util.logging.{Level, Logger}
 
 import io.legs.specialized._
 import io.legs.utils.{ActionTokenizer, JsonFriend}
-import play.api.libs.json.JsValue
+import play.api.libs.json.{Json, JsValue}
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{ExecutionContext, Future}
@@ -92,7 +92,7 @@ object Specialization {
 
 	def executeStep(step: Step, state: State)(implicit willWait: Duration = waitFor) : RoutableFuture = {
 		try {
-			(getInputs(tokenizd(step.action.toList)) match {
+			(getInputs(tokenized(step.action.toList)) match {
 				case m :: Nil => throw new Throwable("a step has to have at least a module and the command")
 				case m :: c :: xs if m.s.contains(".") => // check if the module name has already full path
 					(m.s, c.s, xs)
@@ -108,7 +108,7 @@ object Specialization {
 						case ((_args, _state), KeyToken(s)) => (s :: _args, _state)
 						case ((_args, _state), ValueToken(s)) =>
 							val uid = UUID.randomUUID().toString
-							(uid :: _args, _state.updated(uid, s))
+							(uid :: _args, _state.updated(uid, Json.parse(s)))
 					} match {
 						case (_args, _state) =>
 							Specialization.synchronized {

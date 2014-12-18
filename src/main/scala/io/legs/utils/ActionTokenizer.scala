@@ -10,10 +10,10 @@ object ActionTokenizer {
 	case class ValueToken(s : String) extends InputToken
 	case class Segment(left : InputToken, right: ActionToken) extends ActionToken
 
-	def tokenizd(query : List[Char]) : ActionToken =
+	def tokenized(query : List[Char]) : ActionToken =
 		tokenizeQueryImpl(query.reverse) //the query parsing happens in reverse..
 
-	private val hasUnescapedCurly = """.+\{\$""".r
+	private val hasUnescapedCurly = """.+?\{\$""".r
 
 	/**
 	 * TODO: add support for escaping slash charecter
@@ -25,7 +25,7 @@ object ActionTokenizer {
 			case '/'::xs => 			tokenizeQueryImpl(xs, Some(out.getOrElse(Empty)))
 			case '}'::xs if xs.headOption != Some('\\') && hasUnescapedCurly.findFirstIn(xs.toIndexedSeq).isDefined =>
 				val value = hasUnescapedCurly.findFirstIn(xs.toIndexedSeq).get.dropRight(2) // drop the $} stuff after extraction
-				val leftOver = hasUnescapedCurly.split(xs.toIndexedSeq).tail.mkString // this is the left over text
+				val leftOver = xs.drop(value.length +2) // this is the left over text
 				out match {
 					case None => 		tokenizeQueryImpl(leftOver.toList, Some(ValueToken(value.reverse)))
 					case Some(qt) => 	tokenizeQueryImpl(leftOver.toList, Some(Segment(ValueToken(value.reverse),qt)))

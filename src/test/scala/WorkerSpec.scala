@@ -80,5 +80,33 @@ class WorkerSpec extends FunSpec with AsyncAssertions with Eventually {
 
 	}
 
+	it("allows inlining json values in action"){
+		val uuid = getUUID
+
+		val instructions= s"""
+			  |[
+			  |	{
+			  | 	"action":"io.legs.specialized.Tools/MAP_PAR/$${[1,2,3,4,5,6,7,8,9,10]}/$${\\"num\\"}/instructionsP",
+			  |  	"values": {
+			  |      	"instructionsP":[
+			  |       		{
+			  |         		"action":"helpers.TestSpecializer/incr/key",
+			  |           		"values":{
+			  |             		"key":"$uuid"
+			  |               	}
+			  |         	}
+			  |       	]
+			  |     }
+			  |	}
+			  |]
+			""".stripMargin
+
+		Worker.execute(instructions) match {
+			case Success(_)=>
+				assertResult(10) { TestSpecializer.getKeyValue(uuid) }
+			case Failure(e)=> fail(e)
+		}
+	}
+
 
 }
