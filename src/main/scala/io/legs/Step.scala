@@ -4,9 +4,6 @@ import play.api.libs.json._
 import java.util.logging.{Level, Logger}
 
 
-/**
- * Created: 6/27/13 2:40 PM
- */
 case class Step (
 	action: String,
 	values: Option[Map[String,JsValue]],

@@ -1,9 +1,10 @@
 package io.legs
 
+import java.util.UUID
 import java.util.logging.{Level, Logger}
 
 import io.legs.specialized._
-import io.legs.utils.JsonFriend
+import io.legs.utils.{ActionTokenizer, JsonFriend}
 import play.api.libs.json.JsValue
 
 import scala.concurrent.duration.Duration
@@ -87,42 +88,47 @@ object Specialization {
 
 	lazy val registeredSpecializedClasses = List(LinkTracker,Numbers,Persistor,Queue,SimpleScraper,Strings,Tools,WebDriver,MapReduce,JsonSpecialized)
 
+	import ActionTokenizer._
+
 	def executeStep(step: Step, state: State)(implicit willWait: Duration = waitFor) : RoutableFuture = {
-
 		try {
+			(getInputs(tokenizd(step.action.toList)) match {
+				case m :: Nil => throw new Throwable("a step has to have at least a module and the command")
+				case m :: c :: xs if m.s.contains(".") => // check if the module name has already full path
+					(m.s, c.s, xs)
+				case c :: xs =>
+					val moduleName = registeredSpecializedClasses.find(sp =>
+						sp.getRoute(c.s, xs.length).isDefined
+					).getOrElse(throw new Throwable(s"could not resolve route for ${c.s} args:${step.action}"))
+					  .getClass.getName.replace("$", "")
+					(moduleName, c.s, xs)
+			}) match {
+				case (moduleName, commandName, args) =>
+					args.reverse.foldLeft(List.empty[String], state) {
+						case ((_args, _state), KeyToken(s)) => (s :: _args, _state)
+						case ((_args, _state), ValueToken(s)) =>
+							val uid = UUID.randomUUID().toString
+							(uid :: _args, _state.updated(uid, s))
+					} match {
+						case (_args, _state) =>
+							Specialization.synchronized {
+								import scala.reflect.runtime.universe
+								val runtimeMirror = universe.runtimeMirror(getClass.getClassLoader)
+								val module = runtimeMirror.staticModule(moduleName)
 
-			val routeParts = step.action.split("/")
-
-			val (specializedClass, specializedAction, paramNames) =
-				if (step.action.contains(".")) {
-					(routeParts(0), routeParts(1), routeParts.slice(2, routeParts.length).toList)
-				} else {
-					val actionName = routeParts(0)
-					val args = routeParts.slice(1, routeParts.length).toList
-					val routeName = registeredSpecializedClasses.find(sp =>
-						sp.getRoute(actionName, args.length).isDefined
-					).getOrElse(throw new Throwable(s"could not resolve route for $actionName args:${args.mkString(",")}"))
-							.getClass.getName.replace("$", "")
-					(routeName, actionName, args)
-				}
-
-			Specialization.synchronized {
-				import scala.reflect.runtime.universe
-				val runtimeMirror = universe.runtimeMirror(getClass.getClassLoader)
-				val module = runtimeMirror.staticModule(specializedClass)
-
-				runtimeMirror.reflectModule(module)
-			}.instance match {
-				case specInstance: Specialization =>
-					specInstance.invokeAction(specializedAction, paramNames, state, step.values.getOrElse(Map()))
-				case _ =>
-					Future.failed(new Exception(s"The class $specializedClass is not extending 'Specialization' "))
+								runtimeMirror.reflectModule(module)
+							}.instance match {
+								case specInstance: Specialization =>
+									specInstance.invokeAction(commandName, _args, _state, step.values.getOrElse(Map()))
+								case _ =>
+									Future.failed(new Exception(s"The class $moduleName is not extending 'Specialization' "))
+							}
+					}
 			}
 
 		} catch {
-			case e : Throwable => Future.failed(e)
+			case e: Throwable => Future.failed(e)
 		}
-
 	}
 
 	private def allParamsDefined(params: List[String], state: Specialization.State): Boolean =
