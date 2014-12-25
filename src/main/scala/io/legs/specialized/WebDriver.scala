@@ -4,6 +4,7 @@ import java.io.File
 
 import io.legs.Specialization
 import io.legs.Specialization.{RoutableFuture, Yield}
+import io.legs.documentation.Annotations.{LegsParamAnnotation, LegsFunctionAnnotation}
 import io.legs.utils.UserAgents
 import org.apache.commons.io.FileUtils
 import org.openqa.selenium.By
@@ -19,7 +20,15 @@ object WebDriver extends Specialization {
 	//http://docs.seleniumhq.org/docs/03_webdriver.jsp#user-input-filling-in-forms
 	//http://refcardz.dzone.com/refcardz/getting-started-selenium
 
-	def WD_VISIT(state: Specialization.State, url : String)(implicit ctx : ExecutionContext) : RoutableFuture = Future {
+	//TOOD: refactor WD to LIVE_VISIT
+	@LegsFunctionAnnotation(
+		details = "start a WebDriver session ",
+		yieldType = "WebDriver",
+		yieldDetails = "a WebDriver instance"
+	)
+	def WD_VISIT(state: Specialization.State,
+		url : String @LegsParamAnnotation("web url")
+	)(implicit ctx : ExecutionContext) : RoutableFuture = Future {
 		val executablePath = "/tmp/phantomjs"
 		val dstFile = new File(executablePath)
 		if (!dstFile.exists()){
@@ -36,32 +45,65 @@ object WebDriver extends Specialization {
 		Yield(Some(driver))
 	}
 
-	def WD_SELECT_DROPDOWN(state: Specialization.State, driver : Any, elementXpathSelector : String, elementValue : String)(implicit ctx : ExecutionContext) : RoutableFuture =
+	@LegsFunctionAnnotation(
+		details = "select value from dropdown",
+		yieldType = None,
+		yieldDetails = "nothing is yielded"
+	)
+	def WD_SELECT_DROPDOWN(state: Specialization.State,
+		driver : Any @LegsParamAnnotation("instance of a WebDriver"),
+		xpath : String @LegsParamAnnotation("XPATH"),
+		elementValue : String @LegsParamAnnotation("element value to select from the dropdown items")
+	)(implicit ctx : ExecutionContext) : RoutableFuture =
 		Future {
 			val _driver = driver.asInstanceOf[PhantomJSDriver]
-			val foundElement = _driver.findElementByXPath(elementXpathSelector)
+			val foundElement = _driver.findElementByXPath(xpath)
 			val select = new Select(foundElement)
 			select.selectByValue(elementValue)
 			Yield(None)
 		}
 
-	def WD_CLICK(state: Specialization.State, driver : Any, elementXpathSelector : String)(implicit ctx : ExecutionContext) : RoutableFuture =
+	@LegsFunctionAnnotation(
+		details = "click on item",
+		yieldType = None,
+		yieldDetails = "nothing is yielded"
+	)
+	def WD_CLICK(state: Specialization.State,
+		driver : Any @LegsParamAnnotation("instance of WebDriver"),
+		xpath : String @LegsParamAnnotation("XPATH")
+	)(implicit ctx : ExecutionContext) : RoutableFuture =
 		Future {
 			val _driver = driver.asInstanceOf[PhantomJSDriver]
-			val foundElement = _driver.findElementByXPath(elementXpathSelector)
+			val foundElement = _driver.findElementByXPath(xpath)
 			foundElement.click()
 			Yield(None)
 		}
 
-	def WD_WAIT_UNTIL_SELECTOR(state: Specialization.State, driver : Any, xpathValidator : String)(implicit ctx : ExecutionContext) : RoutableFuture =
+	@LegsFunctionAnnotation(
+		details = "wait until XPATH returns vlaue inside a live page",
+		yieldType = None,
+		yieldDetails = "nothing is yielded"
+	)
+	def WD_WAIT_UNTIL_SELECTOR(state: Specialization.State,
+		driver : Any @LegsParamAnnotation("instance of WebDriver"),
+		xpath : String @LegsParamAnnotation("XPATH")
+	)(implicit ctx : ExecutionContext) : RoutableFuture =
 		Future {
 			val _driver = driver.asInstanceOf[PhantomJSDriver]
 			new WebDriverWait(_driver, 10)
-					.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(xpathValidator)))
+					.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(xpath)))
 			Yield(None)
 		}
 
-	def WD_XPATH_CHECK(state: Specialization.State, driver : Any, xpath : String)(implicit ctx : ExecutionContext) : RoutableFuture =
+	@LegsFunctionAnnotation(
+		details = "execute XPATH and return true if something is returned",
+		yieldType = Boolean,
+		yieldDetails = "true if found something, false otherwise"
+	)
+	def WD_XPATH_CHECK(state: Specialization.State,
+		driver : Any @LegsParamAnnotation("instance of WebDriver"),
+		xpath : String @LegsParamAnnotation("XPATH")
+	)(implicit ctx : ExecutionContext) : RoutableFuture =
 		Future {
 			val _driver = driver.asInstanceOf[PhantomJSDriver]
 			val isFound = try {
@@ -72,14 +114,28 @@ object WebDriver extends Specialization {
 			Yield(Some(isFound))
 		}
 
-	def WD_GET_HTML(state: Specialization.State, driver : Any)(implicit ctx : ExecutionContext) : RoutableFuture =
+	@LegsFunctionAnnotation(
+		details = "get current HTML value of given WebDriver instance",
+		yieldType = "String",
+		yieldDetails = "string value of HTML"
+	)
+	def WD_GET_HTML(state: Specialization.State,
+		driver : Any @LegsParamAnnotation("WebDriver instance")
+	)(implicit ctx : ExecutionContext) : RoutableFuture =
 		Future {
 			val _driver = driver.asInstanceOf[PhantomJSDriver]
 			val source = _driver.getPageSource
 			Yield(Some(source))
 		}
 
-	def WD_CLOSE(state: Specialization.State, driver : Any) : RoutableFuture = {
+	@LegsFunctionAnnotation(
+		details = "shutdown and cleanup WebDriver instance",
+		yieldType = None,
+		yieldDetails = "nothing is yielded"
+	)
+	def WD_CLOSE(state: Specialization.State,
+		driver : Any @LegsParamAnnotation("WebDriver instance")
+	) : RoutableFuture = {
 		driver.asInstanceOf[PhantomJSDriver].close()
 		Future.successful(Yield(None))
 	}

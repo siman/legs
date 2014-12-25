@@ -5,6 +5,7 @@ import javax.script.{Invocable, ScriptEngineManager}
 
 import io.legs.Specialization
 import io.legs.Specialization.{RoutableFuture, Yield}
+import io.legs.documentation.Annotations.{LegsParamAnnotation, LegsFunctionAnnotation}
 
 import scala.concurrent._
 
@@ -14,7 +15,18 @@ object MapReduce extends Specialization {
 
 	type EmitMap = scala.collection.mutable.HashMap[String,List[Any]]
 
-	def MAP_REDUCE(state: Specialization.State, collection : List[Any], map : String, reduce : String)(implicit ctx : ExecutionContext) : RoutableFuture  =
+	@LegsFunctionAnnotation(
+		details = "execute a JavaScript Map and Reduce functions over input collection",
+		yieldType = Map.empty[String,Any],
+		yieldDetails = "indices and values after map reduce"
+	)
+	def MAP_REDUCE(state: Specialization.State,
+		collection : List[Any] @LegsParamAnnotation("list of input values"),
+		map : String @LegsParamAnnotation("needs to contain \"function map(item, collection,emitter) {...} \" " +
+			"call `emitter.emit(key,valie)` to emit values "),
+		reduce : String @LegsParamAnnotation("needs to contain \"function reduce(key, values){ ... }\" " +
+			"returned value is reduces to the resulting map for that key")
+	)(implicit ctx : ExecutionContext) : RoutableFuture  =
 		Future {
 
 			val mapperEngine = new ScriptEngineManager(null).getEngineByName("nashorn")

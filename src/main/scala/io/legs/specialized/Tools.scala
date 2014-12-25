@@ -4,14 +4,10 @@ import java.util.logging.Logger
 
 import io.legs.Specialization.{RoutableFuture, Yield}
 import io.legs._
-import play.api.libs.json._
+import io.legs.documentation.Annotations.{LegsFunctionAnnotation, LegsParamAnnotation}
+import play.api.libs.json.{JsArray, JsNumber, JsString, _}
 
 import scala.concurrent.{ExecutionContext, Future}
-import io.legs.Specialization.Yield
-import play.api.libs.json.JsArray
-import play.api.libs.json.JsString
-import scala.Some
-import play.api.libs.json.JsNumber
 
 /**
  * Created: 6/11/13 4:53 PM
@@ -20,14 +16,27 @@ object Tools extends Specialization {
 
 	val specializedBaseLogger = Logger.getLogger(this.getClass.getSimpleName)
 
-	def CAST(state: Specialization.State, input: Any, toType:String)(implicit ctx : ExecutionContext) : RoutableFuture =
+
+	@LegsFunctionAnnotation(
+		details = "convert given input value to Int/String",
+		yieldType = "Int/String",
+		yieldDetails = "the type as provided"
+	)
+	def CAST(state: Specialization.State,
+		input: Any @LegsParamAnnotation("either String/Int"),
+		toType:String @LegsParamAnnotation("can be either Int/String")
+	)(implicit ctx : ExecutionContext) : RoutableFuture =
 		input match {
-			case _ : Int => toType match {
-				case "String" => Future.successful(Yield(Some(input.toString)))
-			}
-			case default => Future.successful(Yield(Some(input)))
+			case in : Int 		if toType == "String" => 	Future.successful(Yield(Some(in.toString)))
+			case in : String 	if toType == "Int" => 		Future.successful(Yield(Some(in.toInt)))
+			case default => 								Future.successful(Yield(Some(input)))
 		}
 
+	@LegsFunctionAnnotation(
+		details = "helper function to debug (print to STDOUT) the state",
+		yieldType = None,
+		yieldDetails = "nothing is yielded"
+	)
 	def DEBUG(state:Specialization.State) : RoutableFuture = {
 		specializedBaseLogger.info("START dumping DEBUG information for state")
 		state.keys.map(k=> { specializedBaseLogger.info(s"key:'$k' value:'${state.get(k).head}' ") } )
@@ -40,16 +49,40 @@ object Tools extends Specialization {
 		lazy val stateAndYield = yielded ++ state
 	}
 
-	def IS_STRINGS_EQUAL(state:Specialization.State, val1 :Any, val2:Any) : RoutableFuture =
-		Future.successful(Yield(Some(val1.toString == val2.toString)))
+	@LegsFunctionAnnotation(
+		details = "check if two inputs stringified are equal",
+		yieldType = Boolean,
+		yieldDetails = "true of they are, false otherwise"
+	)
+	def IS_STRINGS_EQUAL(state:Specialization.State,
+		left : Any @LegsParamAnnotation("left value"),
+		right : Any @LegsParamAnnotation("right value")
+	) : RoutableFuture =
+		Future.successful(Yield(Some(left.toString == right.toString)))
 
-	def IS_STRING_DIFFERENT(state:Specialization.State, val1 :Any, val2:Any) : RoutableFuture =
-		Future.successful(Yield(Some(val1.toString != val2.toString)))
+	@LegsFunctionAnnotation(
+		details = "check if two inputs stringified are different",
+		yieldType = Boolean,
+		yieldDetails = "true if different, false otherwise"
+	)
+	def IS_STRING_DIFFERENT(state:Specialization.State,
+		left :Any @LegsParamAnnotation("left value"),
+		right : Any @LegsParamAnnotation("right value")
+	) : RoutableFuture =
+		Future.successful(Yield(Some(left.toString != right.toString)))
 
-
-	def IF(state:Specialization.State, value:Any, trueInstructions: JsArray, falseInstructions: JsArray) : RoutableFuture =
-		value match {
-			case true | "true" | "True" =>
+	@LegsFunctionAnnotation(
+		details = "evaluates input value as boolean string true or 1, otherwise false. executes relevant block ",
+		yieldType = AnyRef,
+		yieldDetails = "what ever the evaluated block is returning"
+	)
+	def IF(state:Specialization.State,
+		value : Any @LegsParamAnnotation("Boolean input value"),
+		trueInstructions: JsArray @LegsParamAnnotation("instrucitons block to be executed when true"),
+		falseInstructions: JsArray @LegsParamAnnotation("instrucitons block to be executed when false")
+	) : RoutableFuture =
+		value.toString.toLowerCase match {
+			case "true" | "1" =>
 				val steps = Step.from(trueInstructions)
 				Worker.walk(steps,state)
 			case _ =>
@@ -57,10 +90,18 @@ object Tools extends Specialization {
 				Worker.walk(steps,state)
 		}
 
-
-	def MAP_PAR(state:Specialization.State, over: List[Any], toValueName: String, furtherInstructions: JsArray)(implicit ctx : ExecutionContext) : RoutableFuture =
+	@LegsFunctionAnnotation(
+		details = "iterate over a collection of values and produce a new resulting list from applying further instructions on each input vlaue",
+		yieldType = List.empty[Any],
+		yieldDetails = "list of resulting transformed values"
+	)
+	def MAP_PAR(state:Specialization.State,
+		inputList: List[Any] @LegsParamAnnotation("input list of values"),
+		toValueName: String @LegsParamAnnotation("each item is assigned this name when iterating"),
+		furtherInstructions: JsArray @LegsParamAnnotation("instructions set to use when manipulating a single value")
+	)(implicit ctx : ExecutionContext) : RoutableFuture =
 		Future.fold(
-			over.map { o => Worker.walk(Step.from(furtherInstructions), state + (toValueName -> o)) }
+			inputList.map { o => Worker.walk(Step.from(furtherInstructions), state + (toValueName -> o)) }
 		)(Yield(Some(Nil)) : Yield) {
 			(out, result) =>
 				result match {
@@ -71,14 +112,30 @@ object Tools extends Specialization {
 				}
 		}
 
-	def GET_MAP_KEY(state:Specialization.State, map : Map[String,Any], key : String) : RoutableFuture =
+	@LegsFunctionAnnotation(
+		details = "get a single entry form a map by given key",
+		yieldType = AnyRef,
+		yieldDetails = "value produced by key from the map"
+	)
+	def GET_MAP_KEY(state:Specialization.State,
+		map : Map[String,Any] @LegsParamAnnotation("a map data structure to query"),
+		key : String @LegsParamAnnotation("key to use for querying the map")
+	) : RoutableFuture =
 		map.contains(key) match {
 			case true => Future.successful(Yield(Some(map(key))))
 			case false => Future.failed(new Throwable(s"could not find key:$key in map"))
 		}
 
 	// todo add a limit to number of iteratios (as parameter?)
-	def LOOP_WHILE(state:Specialization.State, checkInstructions : JsArray, overInstructions : JsArray)(implicit ctx : ExecutionContext) : RoutableFuture =
+	@LegsFunctionAnnotation(
+		details = "loop while given instructions yield true",
+		yieldType = None,
+		yieldDetails = "nothing is yielded"
+	)
+	def LOOP_WHILE(state:Specialization.State,
+		checkInstructions : JsArray @LegsParamAnnotation("instructions to evaluate for stop condition - should yield boolean"),
+		overInstructions : JsArray @LegsParamAnnotation("perform instructions inside the while loop if the checkInstructions yielded true")
+	)(implicit ctx : ExecutionContext) : RoutableFuture =
 		Worker.walk(Step.from(checkInstructions),state).flatMap {
 			case Yield(Some(true))=>
 				Worker.walk(Step.from(overInstructions),state).flatMap {
@@ -89,23 +146,44 @@ object Tools extends Specialization {
 				Future.successful(Yield(None))
 		}
 
-	def ECHO(state:Specialization.State,value:Any) : RoutableFuture = {
+	@LegsFunctionAnnotation(
+		details = "yield and print (STDOUT) some given value",
+		yieldType = AnyRef,
+		yieldDetails = "state value"
+	)
+	def ECHO(state:Specialization.State,
+		value:Any @LegsParamAnnotation("some provided value")
+	) : RoutableFuture = {
 		println(value)
 		Future.successful(Yield(Some(value)))
 	}
 
-	def VERIFY_VALUES(state:Specialization.State, values : List[JsString]) : RoutableFuture =
-		values.map(_.value).forall(state.keys.toList.contains) match {
+	@LegsFunctionAnnotation(
+		details = "check that all provided keys are defined in state, otherwise fail the job",
+		yieldType = None,
+		yieldDetails = "nothing is yielded"
+	)
+	def VERIFY_VALUES(state:Specialization.State,
+		keys : List[JsString] @LegsParamAnnotation("list of keys to check for")
+	) : RoutableFuture =
+		keys.map(_.value).forall(state.keys.toList.contains) match {
 			case true => Future.successful(Yield(None))
-			case false => Future.failed(new Throwable("could not verify all values, missing: " + values.filterNot(state.keys.toList.contains).mkString(",") ))
+			case false => Future.failed(new Throwable("could not verify all values, missing: " + keys.filterNot(state.keys.toList.contains).mkString(",") ))
 		}
 
-	def AS_JSON(state:Specialization.State, keys : List[JsString])(implicit ctx : ExecutionContext) : RoutableFuture =
+	@LegsFunctionAnnotation(
+		details = "take state values and put them into a JSON map",
+		yieldType = "String",
+		yieldDetails = "string representation of JSON value put togather"
+	)
+	def AS_JSON(state:Specialization.State,
+		keys : List[JsString] @LegsParamAnnotation("list of keys to take from state")
+	)(implicit ctx : ExecutionContext) : RoutableFuture =
 		Future {
 			Yield(Some(constructJson(state,keys)))
 		}
 
-	def constructJson(state:Specialization.State, keys : List[JsString]) : String =
+	def constructJson(state:Specialization.State,keys : List[JsString] @LegsParamAnnotation("")) : String =
 		Json.toJson(keys.foldLeft(Map.empty[String, JsValue]) {
 			(_out, key) =>
 				state.get(key.value) match {

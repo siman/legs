@@ -6,6 +6,7 @@ import javax.xml.transform.stream.StreamSource
 
 import io.legs.Specialization
 import io.legs.Specialization.{RoutableFuture, Yield}
+import io.legs.documentation.Annotations.{LegsParamAnnotation, LegsFunctionAnnotation}
 import io.legs.network.Communicator
 import io.legs.network.simple.SimpleCommunicator
 import net.sf.saxon.s9api.Processor
@@ -28,25 +29,45 @@ trait Scraper extends Specialization {
 
 	def communicator: Communicator
 
-	def FETCH(state: Specialization.State, url:String)(implicit ctx : ExecutionContext) : RoutableFuture =
+
+	@LegsFunctionAnnotation(
+		details = "fetch HTML web resource, while fixing the underlying HTML then turn to String",
+		yieldType = "String",
+		yieldDetails = "returns the resource as string"
+	)
+	def FETCH(state: Specialization.State,
+		url:String @LegsParamAnnotation("web url")
+	)(implicit ctx : ExecutionContext) : RoutableFuture =
 		Future {
 			val res = communicator.getHtmlStr(url)
 			Yield(Some(res))
 		}
 
-	def FETCH_RAW(state: Specialization.State, url:String)(implicit ctx : ExecutionContext) : RoutableFuture =
+	@LegsFunctionAnnotation(
+		details = "fetch raw resource",
+		yieldType = "String",
+		yieldDetails = "string value of fetched resource"
+	)
+	def FETCH_RAW(state: Specialization.State,
+		url:String @LegsParamAnnotation("web url")
+	)(implicit ctx : ExecutionContext) : RoutableFuture =
 		Future {
 			val res = communicator.getUrlStr(url)
 			Yield(Some(res))
 		}
 
-
-	/*
-	* Uses Jsoup extractor syntax for extraction
-	* docs - http://jsoup.org/cookbook/extracting-data/selector-syntax
-	* playground - http://try.jsoup.org/
-	* */
-	def EXTRACT_JSOUP(state: Specialization.State, inputString: String, selector: String, validator: String )(implicit ctx : ExecutionContext) : RoutableFuture =
+	@LegsFunctionAnnotation(
+		details = "Uses Jsoup selector syntax for extraction of values from structured HTML/XML" +
+			"docs - docs - http://jsoup.org/cookbook/extracting-data/selector-syntax" +
+			"playground - playground - http://try.jsoup.org/",
+		yieldType = List.empty[String],
+		yieldDetails = "list of matching values"
+	)
+	def EXTRACT_JSOUP(state: Specialization.State,
+		inputString: String @LegsParamAnnotation("input HTML/XML as String"),
+		selector: String @LegsParamAnnotation("JSOUP style selector"),
+		validator: String @LegsParamAnnotation("a validation REGEX")
+	)(implicit ctx : ExecutionContext) : RoutableFuture =
 		Future {
 			val parsed = Jsoup.parse(inputString)
 
@@ -57,7 +78,16 @@ trait Scraper extends Specialization {
 		}
 
 
-	def EXTRACT_XML_XPATH(state: Specialization.State, inputString: String, selector: String, validator: String )(implicit ctx : ExecutionContext) : RoutableFuture =
+	@LegsFunctionAnnotation(
+		details = "extract values from correctly structured XML input value using XPATH selector",
+		yieldType = List.empty[String],
+		yieldDetails = "resulting list of values"
+	)
+	def EXTRACT_XML_XPATH(state: Specialization.State,
+		inputString: String @LegsParamAnnotation("valid XML"),
+		selector: String @LegsParamAnnotation("XPATH expression"),
+		validator: String @LegsParamAnnotation("REGEX result validation")
+	)(implicit ctx : ExecutionContext) : RoutableFuture =
 		Future {
 			val processor = new Processor(false)
 			val cleanInput = inputString.replace('&', ' ')
@@ -74,15 +104,16 @@ trait Scraper extends Specialization {
 			Yield(Some(foundItems))
 		}
 
-
-
-
-	/*
-	* Uses XPATH style for extraction
-	* http://www.saxonica.com/documentation/#!functions
-	* http://www.saxonica.com/documentation/#!expressions
-	* */
-	def EXTRACT_HTML_XPATH(state: Specialization.State, inputString: String, selector: String, validator: String )(implicit ctx : ExecutionContext) : RoutableFuture =
+	@LegsFunctionAnnotation(
+		details = "execute XPATH expression over valid HTML formatted string",
+		yieldType = List.empty[String],
+		yieldDetails = "list of matching values"
+	)
+ 	def EXTRACT_HTML_XPATH(state: Specialization.State,
+		inputString: String @LegsParamAnnotation("valid HTML"),
+		selector: String @LegsParamAnnotation("XPATH expression"),
+		validator: String @LegsParamAnnotation("REGEX result validation")
+	)(implicit ctx : ExecutionContext) : RoutableFuture =
 		Future {
 
 			val cleaner = new HtmlCleaner()
@@ -106,8 +137,16 @@ trait Scraper extends Specialization {
 			Yield(Some(foundItems))
 		}
 
-
-	def EXTRACT_HTML_XPATH_FIRST(state: Specialization.State, inputString: String, selector: String, validator: String )(implicit ctx : ExecutionContext) : RoutableFuture =
+	@LegsFunctionAnnotation(
+		details = "execute XPATH expression over valid HTML formatted string",
+		yieldType = "String",
+		yieldDetails = "single matching value as String"
+	)
+	def EXTRACT_HTML_XPATH_FIRST(state: Specialization.State,
+		inputString: String @LegsParamAnnotation("valid HTML"),
+		selector: String @LegsParamAnnotation("XPATH expression"),
+		validator: String @LegsParamAnnotation("REGEX result validation")
+	)(implicit ctx : ExecutionContext) : RoutableFuture =
 		EXTRACT_HTML_XPATH(state,inputString,selector,validator).map {
 			case Yield(Some(x::xs)) => Yield(Some(x))
 			case Yield(None) | Yield(Some(Nil)) => Yield(Some(""))

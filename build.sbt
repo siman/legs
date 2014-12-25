@@ -11,7 +11,7 @@ organization := "io.legs"
 
 name := "legs"
 
-version := "0.8.4.3"
+version := "0.8.5.0"
 
 scalaVersion := "2.11.4"
 
@@ -39,6 +39,10 @@ initialize := {
 fork in Test := true
 
 parallelExecution in Test := false
+
+lazy val gendocs = taskKey[Unit]("generated the Legs.io API documentation")
+
+fullRunTask(gendocs, Compile, "io.legs.documentation.GenerateDocumentation")
 
 resolvers += "Sonatype OSS releases" at "https://oss.sonatype.org/service/local/staging/deploy/maven2"
 

@@ -5,6 +5,7 @@ import java.util.logging.{Level, Logger}
 import com.uniformlyrandom.scron.Scron
 import io.legs.Specialization
 import io.legs.Specialization.{RoutableFuture, Yield}
+import io.legs.documentation.Annotations.{LegsParamAnnotation, LegsFunctionAnnotation}
 import io.legs.scheduling.{Job, JobStatus, JobType, Priority}
 import io.legs.utils.{EnumJson, JsonFriend, RedisProvider}
 import org.joda.time.{DateTime, DateTimeZone}
@@ -204,7 +205,17 @@ object Queue extends Specialization {
 		}
 	}
 
-	def ADD_JOB(state: Specialization.State, instructions: String, description:String, labels: List[JsString], inputIndices:List[JsString])(implicit ctx : ExecutionContext) : RoutableFuture =
+	@LegsFunctionAnnotation(
+		details = "Add a job to the FIFO queue",
+		yieldType = "String",
+		yieldDetails = "new job id is yielded"
+	)
+	def ADD_JOB(state: Specialization.State,
+		instructions: String @LegsParamAnnotation("name of instructions file"),
+		description: String @LegsParamAnnotation("job description"),
+		labels: List[JsString] @LegsParamAnnotation("list of labels to be used to target specific queues"),
+		inputIndices:List[JsString] @LegsParamAnnotation("values to be taken from the state as input for the new job")
+	)(implicit ctx : ExecutionContext) : RoutableFuture =
 		Future {
 
 			val inputKeys =  inputIndices.map(_.value)
@@ -237,7 +248,15 @@ object Queue extends Specialization {
 		RedisProvider.redisPool.hset(schedulePlansKey_HS, jobId, schedule)
 	}
 
-	def PLAN(state: Specialization.State, schedule: String, jobId: String)(implicit ctx : ExecutionContext) : RoutableFuture =
+	@LegsFunctionAnnotation(
+		details = "create a schedule plan for a job",
+		yieldType = None,
+		yieldDetails = "nothing is returned"
+	)
+	def PLAN(state: Specialization.State,
+		schedule: String @LegsParamAnnotation("the schedule, in cron format"),
+		jobId: String @LegsParamAnnotation("job id to be used")
+	)(implicit ctx : ExecutionContext) : RoutableFuture =
 		Future {
 			blocking { writeJobPlan(jobId, schedule) }
 			Yield(None)
@@ -258,7 +277,14 @@ object Queue extends Specialization {
 		logger.info(s"done queueing job ID:${job.id}")
 	}
 
-	def QUEUE(state: Specialization.State, jobId : String)(implicit ctx : ExecutionContext) : RoutableFuture =
+	@LegsFunctionAnnotation(
+		details = "queue a scheduled job for execution",
+		yieldType = None,
+		yieldDetails = ""
+	)
+	def QUEUE(state: Specialization.State,
+		jobId : String @LegsParamAnnotation("the job ID to be queued according to its schedule plan")
+	)(implicit ctx : ExecutionContext) : RoutableFuture =
 		Future {
 			val jobOpt = getJob(jobId)
 			val jobSchedule = getScheduleForJob(jobId)
@@ -292,6 +318,11 @@ object Queue extends Specialization {
 		}
 	}
 
+	@LegsFunctionAnnotation(
+		details = "queue all scheduled jobs according to their schedule",
+		yieldType = None,
+		yieldDetails = ""
+	)
 	def QUEUE_ALL(state: Specialization.State)(implicit ctx : ExecutionContext) : RoutableFuture =
 		Future {
 			queueAll()

@@ -4,6 +4,7 @@ import java.io.FileWriter
 
 import io.legs.Specialization
 import io.legs.Specialization.{RoutableFuture, Yield}
+import io.legs.documentation.Annotations.{LegsParamAnnotation, LegsFunctionAnnotation}
 import play.api.libs.json._
 
 import scala.concurrent._
@@ -11,8 +12,16 @@ import scala.concurrent._
 object Persistor extends Specialization {
 
 	object WriteSyncObj
-  
-	def TO_FILE(state: Specialization.State, keys : List[JsString], filePath: String)(implicit ctx : ExecutionContext) : RoutableFuture =
+
+	@LegsFunctionAnnotation(
+		details = "persist content to file",
+		yieldType = None,
+		yieldDetails = "nothing is yielded"
+	)
+	def TO_FILE(state: Specialization.State,
+		keys : List[JsString] @LegsParamAnnotation("list of keys to be extracted from state to be serialized"),
+		filePath: String @LegsParamAnnotation("the full file path to be used for persisting the contents")
+	)(implicit ctx : ExecutionContext) : RoutableFuture =
 		Future {
 
 			var appending = List.empty[String]
@@ -34,9 +43,16 @@ object Persistor extends Specialization {
 			Yield(None)
 		}
 
-	def TO_FILE_AS_JSON(state: Specialization.State, keys : List[JsString], filePath: String)(implicit ctx : ExecutionContext) : RoutableFuture =
+	@LegsFunctionAnnotation(
+		details = "persist state key contents to file as a json object",
+		yieldType = None,
+		yieldDetails = "nothing is yielded"
+	)
+	def TO_FILE_AS_JSON(state: Specialization.State,
+		keys : List[JsString] @LegsParamAnnotation("list of keys to be extracted from state to be serialized"),
+		filePath: String @LegsParamAnnotation("the full file path to be used for persisting the contents")
+	)(implicit ctx : ExecutionContext) : RoutableFuture =
 		Future {
-
 			WriteSyncObj.synchronized {
 				val writer = new FileWriter(filePath,true)
 				val objStr = Tools.constructJson(state, keys)
