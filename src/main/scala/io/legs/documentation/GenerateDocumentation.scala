@@ -121,7 +121,7 @@ object GenerateDocumentation {
 
 	private def genFunctionOverviewDoc(f : LegsFunction) =
 		s"""
-		  |#### `${f.name}/${f.params.map(p=> s"${p.name} : ${p.paramType}").mkString("/")}` : `${f.functionAnnotation.yieldType}` [details](#${f.name})
+		  |* `${f.name}/${f.params.map(p=> s"${p.name} : ${p.paramType}").mkString("/")}` : `${f.functionAnnotation.yieldType}` [details](#${f.name})
 		""".stripMargin.trim
 
 	private def genFunctionsDetailedDoc(f : LegsFunction) =
