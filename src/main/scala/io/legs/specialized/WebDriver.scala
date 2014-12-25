@@ -32,7 +32,13 @@ object WebDriver extends Specialization {
 		val executablePath = "/tmp/phantomjs"
 		val dstFile = new File(executablePath)
 		if (!dstFile.exists()){
-			FileUtils.copyURLToFile(getClass.getResource("/phantomjs"), dstFile)
+			val phantomVersion = "198"
+			val osString = System.getProperty("os.name").toLowerCase match {
+				case "mac os x" => "osx"
+				case _ => "linux"
+			}
+			val resourceFileName = s"/phantomjs-$phantomVersion-$osString"
+			FileUtils.copyURLToFile(getClass.getResource(resourceFileName), dstFile)
 		}
 
 		dstFile.setExecutable(true)
