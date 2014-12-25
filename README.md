@@ -8,7 +8,7 @@ scraping and job orchestration library
 
 ### Project goal
 
-Eliminate the cruft (boiler plate) and minimize time to completion of writing a scraper. Ideally only the business logic (moving parts) need to be written, all supporting machinery needs to be already in place and provide simple intuitive APIs
+Eliminate the cruft, boiler plate and minimize time needed to write a scraper. Ideally only the business logic (moving parts) need to be written, all supporting machinery needs to be already in place and provide simple intuitive APIs
 
 ### Installation
 
@@ -76,7 +76,7 @@ Job instructions are sequential and will only continue to the next block when th
 
  * it will resolve `FETCH` to `io.legs.specialized.Scraper.FETCH`
  * the engine will try to resolve the `url` parameter from the `values` first and then from the current "state" (inherited from its preceding sibling)
- * finally it will evaluate and if successful will assign a state value with the name `s_google_news` (the `s_` is just convention to denote a string value)
+ * finally it will evaluate and if successful will assign a state value with the name `s_google_news` (the `s_` is just convention to denote  a string value)
  * the next instructions block will call the `io.legs.specialized.Tools.ECHO` with parameter by that name
  * you should be able to see the source HTML in your console now
 
@@ -88,6 +88,4 @@ Library functions
 To generate a fresh `FUNCTIONS.md` execute `sbt gendocs`
 
 Latest automatically generated are [here](./FUNCTIONS.md)
-
-
 
