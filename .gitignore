@@ -18,4 +18,4 @@ project/plugins/project/
 build-log.xml
 *.iml
 examples
-
+playground.scala

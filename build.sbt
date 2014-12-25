@@ -3,6 +3,7 @@ import sbt._
 import sbtassembly.Plugin._
 import AssemblyKeys._
 import SonatypeKeys._
+import complete.DefaultParsers._
 
 // Import default settings. This changes `publishTo` settings to use the Sonatype repository and add several commands for publishing.
 sonatypeSettings
@@ -41,6 +42,10 @@ fork in Test := true
 parallelExecution in Test := false
 
 lazy val gendocs = taskKey[Unit]("generated the Legs.io API documentation")
+
+val runJson = inputKey[Unit]("A demo input task.")
+
+fullRunInputTask(runJson,Compile,"io.legs.runner.JsonFileRunner")
 
 fullRunTask(gendocs, Compile, "io.legs.documentation.GenerateDocumentation")
 

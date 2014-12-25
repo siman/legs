@@ -75,7 +75,7 @@ object Worker {
 	def execute(jsonString: String, state:Map[String,Any] = Map()): Try[Yield] =
 		 Try { Await.result(executeAsync(jsonString, state),Duration("5 minutes")) }
 
-	def executeAsync(jsonString: String, state:Map[String,Any] = Map()): Future[Yield] = {
+	private def executeAsync(jsonString: String, state:Map[String,Any] = Map()): Future[Yield] = {
 
 		val steps = Step.from(jsonString)
 
