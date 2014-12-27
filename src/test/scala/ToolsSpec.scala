@@ -1,8 +1,10 @@
 import helpers.TestSpecializer
+import io.legs.Specialization.Yield
+import io.legs.{Step, Specialization}
 import io.legs.specialized.Tools
 import java.util.UUID
 import org.scalatest.FunSpec
-import play.api.libs.json.{JsString, JsArray, Json}
+import play.api.libs.json.{JsNumber, JsString, JsArray, Json}
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -61,6 +63,15 @@ class ToolsSpec extends FunSpec  {
 			} catch {
 				case e : Throwable => true
 			}
+		}
+	}
+
+	it("filters a list of input values") {
+		assertResult(Yield(Some(List("2","3","4","5","6").map(n=>JsNumber(BigDecimal(n)))))){
+			Await.result(
+				Specialization.executeStep(Step("""FILTER/${[1,2,3,4,5,6]}/${"^[^1]+"}""", None,None), Map()),
+				Specialization.tenSecDuration
+			)
 		}
 	}
 

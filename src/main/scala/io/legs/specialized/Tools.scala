@@ -113,6 +113,20 @@ object Tools extends Specialization {
 		}
 
 	@LegsFunctionAnnotation(
+		details = "filter a list of values strigified, with a regex expression",
+		yieldType = List.empty[Any],
+		yieldDetails = "list of values"
+	)
+	def FILTER(state:Specialization.State,
+		inputList: List[Any] @LegsParamAnnotation("list of input values"),
+		filterRegex : String @LegsParamAnnotation("REGEX")
+	) : RoutableFuture =
+		Future.successful(
+			Yield(Some(inputList.filter( _.toString.matches(filterRegex))))
+		)
+
+
+	@LegsFunctionAnnotation(
 		details = "get a single entry form a map by given key",
 		yieldType = AnyRef,
 		yieldDetails = "value produced by key from the map"
