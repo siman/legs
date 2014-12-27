@@ -146,4 +146,30 @@ object WebDriver extends Specialization {
 		Future.successful(Yield(None))
 	}
 
+
+	@LegsFunctionAnnotation(
+		details = "switch to iframe inside the page by its name",
+		yieldType = None,
+		yieldDetails = "nothing is returned"
+	)
+	def WD_IFRAME_SWITCH_BYNAMEORID(state: Specialization.State,
+		driver : Any @LegsParamAnnotation("WebDriver instance"),
+		name : String @LegsParamAnnotation("iframe name")
+	) : RoutableFuture = {
+		driver.asInstanceOf[PhantomJSDriver].switchTo().frame(name)
+		Future.successful(Yield(None))
+	}
+
+	@LegsFunctionAnnotation(
+		details = "switch to first found iframe in page",
+		yieldType = None,
+		yieldDetails = "nothing is returned"
+	)
+	def WD_IFRAME_SWITCH_NEXT(state: Specialization.State,
+		driver : Any @LegsParamAnnotation("WebDriver instance")
+	) : RoutableFuture = {
+		driver.asInstanceOf[PhantomJSDriver].switchTo().frame(0)
+		Future.successful(Yield(None))
+	}
+
 }
