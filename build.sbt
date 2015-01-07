@@ -12,7 +12,7 @@ organization := "io.legs"
 
 name := "legs"
 
-version := "0.8.5.1"
+version := "0.8.5.2"
 
 scalaVersion := "2.11.4"
 
@@ -43,7 +43,7 @@ parallelExecution in Test := false
 
 lazy val gendocs = taskKey[Unit]("generated the Legs.io API documentation")
 
-val runJson = inputKey[Unit]("A demo input task.")
+val runJson = inputKey[Unit]("use JSON file as job source")
 
 fullRunInputTask(runJson,Compile,"io.legs.runner.JsonFileRunner")
 
