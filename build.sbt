@@ -12,7 +12,7 @@ organization := "io.legs"
 
 name := "legs"
 
-version := "0.8.5.2"
+version := "0.8.5.3"
 
 scalaVersion := "2.11.4"
 
@@ -52,21 +52,21 @@ fullRunTask(gendocs, Compile, "io.legs.documentation.GenerateDocumentation")
 resolvers += "Sonatype OSS releases" at "https://oss.sonatype.org/service/local/staging/deploy/maven2"
 
 libraryDependencies ++= Seq(
-	"org.scalatest" %% "scalatest" % "2.2.0" % "test",
+	"org.scalatest" %% "scalatest" % "2.2.1" % "test",
 	"org.scalamock" %% "scalamock-scalatest-support" % "3.1.1" % "test",
 	"org.scala-lang"% "scala-reflect"% "2.11.4",
 	"org.jsoup" % "jsoup" % "1.7.2",
-	"com.typesafe.play"%% "play-json" % "2.3.1",
+	"com.typesafe.play" % "play-json_2.11" % "2.4.0-M2",
 	"net.sf.saxon" % "Saxon-HE" % "9.5.1-1",
 	"net.sourceforge.htmlcleaner" % "htmlcleaner" % "2.6.1",
-	"com.typesafe.akka" %% "akka-actor" % "2.3.3",
-	"com.typesafe.akka" %% "akka-testkit" % "2.3.3" % "test",
+	"com.typesafe.akka" %% "akka-actor" % "2.3.8",
+	"com.typesafe.akka" %% "akka-testkit" % "2.3.8" % "test",
 	"org.apache.httpcomponents" % "httpclient" % "4.3.2",
 	"org.apache.httpcomponents" % "httpcore" % "4.3.1",
 	"org.apache.tika" % "tika-core" % "1.4",
 	"org.apache.tika" % "tika-parsers" % "1.4",
 	"com.etaty.rediscala" %% "rediscala" % "1.3.1",
-	"com.uniformlyrandom" %% "scron" % "0.5.1",
+	"com.uniformlyrandom" %% "scron" % "0.5.2",
 	"com.github.detro.ghostdriver" % "phantomjsdriver" % "1.1.0",
 	"io.gatling" %% "jsonpath" % "0.6.2"
 )
