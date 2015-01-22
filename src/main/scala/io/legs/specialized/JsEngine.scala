@@ -30,10 +30,9 @@ object JsEngine extends Specialization {
 		Future {
 
 			val mapperEngine = new ScriptEngineManager(null).getEngineByName("nashorn")
-
 			val mapper = mapperEngine.asInstanceOf[Invocable]
-			val reducerEngine = new ScriptEngineManager(null).getEngineByName("nashorn")
 
+			val reducerEngine = new ScriptEngineManager(null).getEngineByName("nashorn")
 			val reducer = reducerEngine.asInstanceOf[Invocable]
 
 			try {
@@ -71,7 +70,7 @@ object JsEngine extends Specialization {
 	}
 
 	@LegsFunctionAnnotation(
-		details = "execute a JavaScript Map and Reduce functions over input collection",
+		details = "execute arbitrary JavaScript code on some provided input",
 		yieldType = Map.empty[String,Any],
 		yieldDetails = "indices and values after map reduce"
 	)
@@ -81,7 +80,6 @@ object JsEngine extends Specialization {
 	)(implicit ctx : ExecutionContext) : RoutableFuture  =
 		Future {
 			val mapperEngine = new ScriptEngineManager(null).getEngineByName("nashorn")
-
 			val mapper = mapperEngine.asInstanceOf[Invocable]
 
 			mapperEngine.eval(executor)
