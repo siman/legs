@@ -29,12 +29,15 @@ Methods
 * `ECHO/value : Any` : `scala.`package`.AnyRef` [details](#ECHO)
 * `LOOP_WHILE/checkInstructions : JsArray/overInstructions : JsArray` : `scala.None` [details](#LOOP_WHILE)
 * `GET_MAP_KEY/map : Map/key : String` : `scala.`package`.AnyRef` [details](#GET_MAP_KEY)
+* `FILTER/inputList : List/filterRegex : String` : `immutable.this.List.empty[scala.Any]` [details](#FILTER)
 * `MAP_PAR/inputList : List/toValueName : String/furtherInstructions : JsArray` : `immutable.this.List.empty[scala.Any]` [details](#MAP_PAR)
 * `IF/value : Any/trueInstructions : JsArray/falseInstructions : JsArray` : `scala.`package`.AnyRef` [details](#IF)
 * `IS_STRING_DIFFERENT/left : Any/right : Any` : `scala.Boolean` [details](#IS_STRING_DIFFERENT)
 * `IS_STRINGS_EQUAL/left : Any/right : Any` : `scala.Boolean` [details](#IS_STRINGS_EQUAL)
 * `DEBUG/` : `scala.None` [details](#DEBUG)
 * `CAST/input : Any/toType : String` : `"Int/String"` [details](#CAST)
+* `WD_IFRAME_SWITCH_NEXT/driver : Any` : `scala.None` [details](#WD_IFRAME_SWITCH_NEXT)
+* `WD_IFRAME_SWITCH_BYNAMEORID/driver : Any/name : String` : `scala.None` [details](#WD_IFRAME_SWITCH_BYNAMEORID)
 * `WD_CLOSE/driver : Any` : `scala.None` [details](#WD_CLOSE)
 * `WD_GET_HTML/driver : Any` : `"String"` [details](#WD_GET_HTML)
 * `WD_XPATH_CHECK/driver : Any/xpath : String` : `scala.Boolean` [details](#WD_XPATH_CHECK)
@@ -42,6 +45,7 @@ Methods
 * `WD_CLICK/driver : Any/xpath : String` : `scala.None` [details](#WD_CLICK)
 * `WD_SELECT_DROPDOWN/driver : Any/xpath : String/elementValue : String` : `scala.None` [details](#WD_SELECT_DROPDOWN)
 * `WD_VISIT/url : String` : `"WebDriver"` [details](#WD_VISIT)
+* `EXECUTE/input : Object/executor : String` : `scala.this.Predef.Map.empty[String, scala.Any]` [details](#EXECUTE)
 * `MAP_REDUCE/collection : List/map : String/reduce : String` : `scala.this.Predef.Map.empty[String, scala.Any]` [details](#MAP_REDUCE)
 
 
@@ -212,6 +216,13 @@ Yields : `scala.`package`.AnyRef` - value produced by key from the map
  * map : Map - a map data structure to query
  * key : String - key to use for querying the map
 
+#### <a name="FILTER"></a>`FILTER/inputList : List/filterRegex : String` : `immutable.this.List.empty[scala.Any]`
+filter a list of values strigified, with a regex expression
+Yields : `immutable.this.List.empty[scala.Any]` - list of values
+
+ * inputList : List - list of input values
+ * filterRegex : String - REGEX
+
 #### <a name="MAP_PAR"></a>`MAP_PAR/inputList : List/toValueName : String/furtherInstructions : JsArray` : `immutable.this.List.empty[scala.Any]`
 iterate over a collection of values and produce a new resulting list from applying further instructions on each input vlaue
 Yields : `immutable.this.List.empty[scala.Any]` - list of resulting transformed values
@@ -252,6 +263,19 @@ Yields : `"Int/String"` - the type as provided
 
  * input : Any - either String/Int
  * toType : String - can be either Int/String
+
+#### <a name="WD_IFRAME_SWITCH_NEXT"></a>`WD_IFRAME_SWITCH_NEXT/driver : Any` : `scala.None`
+switch to first found iframe in page
+Yields : `scala.None` - nothing is returned
+
+ * driver : Any - WebDriver instance
+
+#### <a name="WD_IFRAME_SWITCH_BYNAMEORID"></a>`WD_IFRAME_SWITCH_BYNAMEORID/driver : Any/name : String` : `scala.None`
+switch to iframe inside the page by its name
+Yields : `scala.None` - nothing is returned
+
+ * driver : Any - WebDriver instance
+ * name : String - iframe name
 
 #### <a name="WD_CLOSE"></a>`WD_CLOSE/driver : Any` : `scala.None`
 shutdown and cleanup WebDriver instance
@@ -299,6 +323,13 @@ start a WebDriver session
 Yields : `"WebDriver"` - a WebDriver instance
 
  * url : String - web url
+
+#### <a name="EXECUTE"></a>`EXECUTE/input : Object/executor : String` : `scala.this.Predef.Map.empty[String, scala.Any]`
+execute arbitrary JavaScript code on some provided input
+Yields : `scala.this.Predef.Map.empty[String, scala.Any]` - indices and values after map reduce
+
+ * input : Object - some input value
+ * executor : String - executor function for which the first parameter is the input value
 
 #### <a name="MAP_REDUCE"></a>`MAP_REDUCE/collection : List/map : String/reduce : String` : `scala.this.Predef.Map.empty[String, scala.Any]`
 execute a JavaScript Map and Reduce functions over input collection
