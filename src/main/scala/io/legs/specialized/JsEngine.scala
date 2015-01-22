@@ -9,7 +9,7 @@ import io.legs.documentation.Annotations.{LegsParamAnnotation, LegsFunctionAnnot
 
 import scala.concurrent._
 
-object MapReduce extends Specialization {
+object JsEngine extends Specialization {
 
 	private lazy val logger = Logger.getLogger(this.getClass.getSimpleName)
 
@@ -69,6 +69,25 @@ object MapReduce extends Specialization {
 				out + (kv._1 -> (kv._2::out.getOrElse(kv._1,List.empty[Any])))
 		}
 	}
+
+	@LegsFunctionAnnotation(
+		details = "execute a JavaScript Map and Reduce functions over input collection",
+		yieldType = Map.empty[String,Any],
+		yieldDetails = "indices and values after map reduce"
+	)
+	def EXECUTE(state: Specialization.State,
+		input : AnyRef @LegsParamAnnotation("some input value"),
+		executor : String @LegsParamAnnotation("executor function for which the first parameter is the input value")
+	)(implicit ctx : ExecutionContext) : RoutableFuture  =
+		Future {
+			val mapperEngine = new ScriptEngineManager(null).getEngineByName("nashorn")
+
+			val mapper = mapperEngine.asInstanceOf[Invocable]
+
+			mapperEngine.eval(executor)
+			Yield(Some(mapper.invokeFunction("executor",input)))
+		}
+
 
 
 

@@ -1,5 +1,5 @@
 import io.legs.Specialization.Yield
-import io.legs.specialized.MapReduce
+import io.legs.specialized.JsEngine
 import org.scalatest.FunSpec
 import play.api.libs.json.JsString
 
@@ -10,7 +10,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 /**
  * Created: 6/3/14 8:22 PM
  */
-class MapReduceSpec extends FunSpec {
+class JSEngineSpec extends FunSpec {
 
 	it("evaluates a map reduce expression while operating on a list of strings"){
 
@@ -36,13 +36,40 @@ class MapReduceSpec extends FunSpec {
 			""".stripMargin
 		)
 
-		val f = MapReduce.invokeAction("MAP_REDUCE",List("collection","map","reduce"),Map("collection" -> collection)
+		val f = JsEngine.invokeAction("MAP_REDUCE",List("collection","map","reduce"),Map("collection" -> collection)
 			,Map("map" -> map, "reduce" -> reduce))
 
 		assertResult(Yield(Some(Map("items" -> "four,three,two,one", "counts" -> 4)))){
 			Await.result(f, Duration("10 second"))
 		}
 
+	}
+
+	it("executes supplied js function in the engine"){
+
+
+		val input = JsString(
+			"""
+			  |{"a":"a","b":"b"}
+			""".stripMargin
+		)
+
+
+		val executor = JsString(
+			"""
+			  |function executor(input){
+			  |	var json = JSON.parse(input);
+			  | return json.a
+			  |}
+			""".stripMargin)
+
+
+		val f = JsEngine.invokeAction("EXECUTE",List("input","executor"),Map()
+			,Map("input" -> input, "executor" -> executor))
+
+		assertResult(Yield(Some("a"))){
+			Await.result(f, Duration("10 second"))
+		}
 
 	}
 
