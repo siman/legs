@@ -1,7 +1,7 @@
 package io.legs.specialized
 
 import java.io.StringReader
-import java.util.logging.Logger
+import grizzled.slf4j.Logger
 import javax.xml.transform.stream.StreamSource
 
 import io.legs.Specialization
@@ -25,7 +25,7 @@ object SimpleScraper extends Scraper {
 
 trait Scraper extends Specialization {
 
-	private lazy val logger = Logger.getLogger(this.getClass.getSimpleName)
+	private lazy val logger = Logger(this.getClass)
 
 	def communicator: Communicator
 

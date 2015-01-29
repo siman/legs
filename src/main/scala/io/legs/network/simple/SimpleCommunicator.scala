@@ -1,5 +1,6 @@
 package io.legs.network.simple
 
+import grizzled.slf4j.Logger
 import io.legs.network.Communicator
 import io.legs.utils.UserAgents
 import org.jsoup.Jsoup
@@ -16,7 +17,7 @@ import java.nio.ByteBuffer
 
 object SimpleCommunicator extends Communicator {
 
-
+	val logger = Logger(getClass)
 
 	def getHtmlStr(url: String): String = {
 		val doc = Jsoup.connect(url).userAgent(UserAgents.getRandom).timeout(100000).get()
@@ -49,7 +50,7 @@ object SimpleCommunicator extends Communicator {
 
 		} catch {
 			case e: Throwable =>
-				println(e)
+				logger.error(e)
 				""
 		}
 

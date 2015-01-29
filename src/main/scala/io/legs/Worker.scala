@@ -1,6 +1,6 @@
 package io.legs
 
-import java.util.logging.{Level, Logger}
+import grizzled.slf4j.Logger
 
 import akka.actor.{Actor, ActorRef, Props}
 import io.legs.Coordinator.{JobFailed, JobSuccess}
@@ -47,8 +47,8 @@ class Worker(coordinator: ActorRef, job: Job) extends Actor {
 	}
 
 	private def workerFail(message:String, e:Option[Throwable] = None){
-		if (e.isDefined) logger.log(Level.WARNING,s"failing jobId:${job.id}  with message:$message",e)
-		else logger.log(Level.WARNING,s"failing jobId:${job.id}  with message:$message")
+		if (e.isDefined) logger.error(s"failing jobId:${job.id}  with message:$message",e.get)
+		else logger.warn("failing jobId:${job.id}  with message:$message")
 		Queue.retryJob(job)
 		coordinator ! JobFailed(job.id, message)
 		stop()
@@ -68,7 +68,7 @@ object Worker {
 
 	case class StartWork()
 
-	private lazy val logger = Logger.getLogger(this.getClass.getSimpleName)
+	private lazy val logger = Logger(this.getClass.getSimpleName)
 
 	def props(coordinator: ActorRef, job:Job) : Props = Props(new Worker(coordinator,job))
 

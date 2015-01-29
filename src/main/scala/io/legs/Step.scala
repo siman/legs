@@ -1,8 +1,7 @@
 package io.legs
 
 import play.api.libs.json._
-import java.util.logging.{Level, Logger}
-
+import grizzled.slf4j.Logger
 
 case class Step (
 	action: String,
@@ -15,7 +14,7 @@ object Step {
 
 	implicit val fmt = Json.format[Step]
 
-	val logger = Logger.getLogger(this.getClass.getSimpleName)
+	val logger = Logger(this.getClass.getSimpleName)
 
 	def from(jsonArray : JsArray) : List[Step] =
 		jsonArray.value.toList.map(v=> fmt.reads(v).getOrElse(
@@ -28,7 +27,7 @@ object Step {
 			case v: JsArray => from(v)
 			case o: JsObject=> from(JsArray(Seq(o)))
 			case _=>
-				logger.log(Level.SEVERE,"bad value passed for json parsing, it can only be JsObject or JsArray:" + jsonString)
+				logger.error("bad value passed for json parsing, it can only be JsObject or JsArray:" + jsonString)
 				Nil
 		}
 

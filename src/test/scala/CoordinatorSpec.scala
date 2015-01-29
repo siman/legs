@@ -1,3 +1,5 @@
+import java.util.concurrent.TimeUnit
+
 import akka.actor.ActorSystem
 import akka.pattern.ask
 import akka.testkit.TestKit
@@ -26,8 +28,8 @@ class CoordinatorSpec extends TestKit(ActorSystem("Step1PrimarySpec")) with FunS
 		val coordActorRef = Coordinator.start(List("scheduler"),1)
 
 		eventually(timeout(Span(2,Seconds))){
-			implicit val t = akka.util.Timeout(2000) // needed for `?` below
-			val f= (coordActorRef ? Coordinator.GetStats).mapTo[CoordinatorStatistics]
+			implicit val t = akka.util.Timeout(2, TimeUnit.SECONDS) // needed for `?` below
+			val f = (coordActorRef ? Coordinator.GetStats).mapTo[CoordinatorStatistics]
 			val stats = Await.result(f, Duration("2 seconds"))
 			println(stats)
 			assertResult(true) { stats.lastWorkQueueCheck.isDefined }

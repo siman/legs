@@ -2,11 +2,14 @@ package io.legs.runner
 
 import java.io.File
 
+import grizzled.slf4j.Logger
 import io.legs.Worker
 
 import scala.util.{Failure, Success}
 
 object JsonFileRunner {
+
+	val logger = Logger(getClass)
 
 	def main(args : Array[String]): Unit ={
 
@@ -22,20 +25,20 @@ object JsonFileRunner {
 		val input = parseArgs(args.toList)
 
 		if (input.isEmpty){
-			println(help)
+			logger.info(help)
 		} else if (input.contains("file") && input("file").isDefined) {
-			println("reading json file from:" + input("file").get)
+			logger.info("reading json file from:" + input("file").get)
 			val jsonStr = scala.io.Source.fromFile(input("file").get,"UTF-8").mkString
 
 			Worker.execute(jsonStr) match {
 				case Success(v) =>
-					println("last yield:")
-					println(v)
-				case Failure(e) => println(e)
+					logger.info("last yield:")
+					logger.info(v)
+				case Failure(e) => logger.info(e)
 			}
 		} else {
-			println("did not understand input:\"" + args.mkString(" ") + "\"")
-			println(help)
+			logger.error("did not understand input:\"" + args.mkString(" ") + "\"")
+			logger.info(help)
 		}
 
 

@@ -96,7 +96,7 @@ class QueueSpec extends FunSpec with AsyncAssertions with BeforeAndAfter {
 	it("takes the next job in the queue"){
 		Await.result(Queue.setupRedis(), Duration(2, "seconds"))
 		Queue.persistJob(testJob)
-		Queue.queueJobImmidietly(testJob)
+		Queue.queueJobImmediately(testJob)
 
 		val jobOpt = Queue.getNextJobFromQueue(List(testJobLabel))
 		assertResult( true ) { jobOpt.isDefined }
@@ -105,7 +105,7 @@ class QueueSpec extends FunSpec with AsyncAssertions with BeforeAndAfter {
 	it("upon taking a job it adds it to the appropriate working priority zlist and removes it from the label queue"){
 		Await.result(Queue.setupRedis(), Duration(2, "seconds"))
 		Queue.persistJob(testJob)
-		Queue.queueJobImmidietly(testJob)
+		Queue.queueJobImmediately(testJob)
 
 		RedisProvider.blocking {
 			_.zrange(Queue.queueByLabelKey_ZL(testJobLabel),0, -1)
@@ -143,7 +143,7 @@ class QueueSpec extends FunSpec with AsyncAssertions with BeforeAndAfter {
 	it("deletes a job"){
 		Await.result(Queue.setupRedis(), Duration(2, "seconds"))
 		Queue.persistJob(testJob)
-		Queue.queueJobImmidietly(testJob)
+		Queue.queueJobImmediately(testJob)
 
 		val jobOpt = Queue.getNextJobFromQueue(List(testJobLabel))
 

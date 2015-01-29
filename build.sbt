@@ -12,7 +12,7 @@ organization := "io.legs"
 
 name := "legs"
 
-version := "0.8.6.0"
+version := "0.8.6.1"
 
 scalaVersion := "2.11.4"
 
@@ -68,7 +68,16 @@ libraryDependencies ++= Seq(
 	"com.etaty.rediscala" %% "rediscala" % "1.3.1",
 	"com.uniformlyrandom" %% "scron" % "0.5.2",
 	"com.github.detro.ghostdriver" % "phantomjsdriver" % "1.1.0",
-	"io.gatling" %% "jsonpath" % "0.6.2"
+	"io.gatling" %% "jsonpath" % "0.6.2",
+	"org.clapper" %% "grizzled-slf4j" % "1.0.2"
+)
+
+libraryDependencies ~= {
+	_.map(_.exclude("org.slf4j", "slf4j-log4j12"))
+}
+
+libraryDependencies in Test ++= Seq(
+	"org.slf4j" % "slf4j-simple" % "1.6.4"
 )
 
 resolvers ++= Seq(

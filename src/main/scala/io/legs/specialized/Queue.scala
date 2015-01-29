@@ -1,6 +1,6 @@
 package io.legs.specialized
 
-import java.util.logging.{Level, Logger}
+import grizzled.slf4j.Logger
 
 import com.uniformlyrandom.scron.Scron
 import io.legs.Specialization
@@ -17,7 +17,7 @@ import scala.concurrent._
 
 object Queue extends Specialization {
 
-	private lazy val logger = Logger.getLogger(this.getClass.getSimpleName)
+	private lazy val logger = Logger(this.getClass)
 
 	final val jobsData_HS = "legs:jobs"
 	final val jobsCounterKey_S = "legs:jobs:counter"
@@ -73,7 +73,7 @@ object Queue extends Specialization {
 	def persistJob(job:Job) =
 		RedisProvider.redisPool.hset(jobsData_HS,job.id,Json.stringify(Json.toJson(job)))
 
-	def queueJobImmidietly(job: Job) =
+	def queueJobImmediately(job: Job) =
 		persistJobQueue(job, DateTime.now(DateTimeZone.UTC).getMillis)
 
 
@@ -95,7 +95,7 @@ object Queue extends Specialization {
 					c.zrem(queueByLabelKey_ZL(l),job.id)
 					c.zrem(queueWorkingByLabelKey_ZL(l),job.id)
 					c.zrem(queueDeferredByLabelKey_ZL(l),job.id)
-				}):::List(
+				}) ::: List(
 					c.hdel(jobsData_HS, job.id),
 					c.hdel(schedulePlansKey_HS, job.id)
 				)
@@ -311,7 +311,7 @@ object Queue extends Specialization {
 						val job = fetchedJob.touch
 						persistJob(job)
 						queueAScheduleJob(job,scheduledJobs(jobId))
-					case None => logger.log(Level.SEVERE,s"failed to find job id $jobId")
+					case None => logger.error(s"failed to find job id $jobId")
 				}
 
 			}

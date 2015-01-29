@@ -1,7 +1,7 @@
 package io.legs
 
 import java.util.UUID
-import java.util.logging.{Level, Logger}
+import grizzled.slf4j.Logger
 
 import io.legs.specialized._
 import io.legs.utils.{ActionTokenizer, JsonFriend}
@@ -15,7 +15,7 @@ trait Specialization {
 
 	import io.legs.Specialization._
 
-	private lazy val spcializationLogger = Logger.getLogger(this.getClass.getSimpleName)
+	private lazy val spcializationLogger = Logger(getClass)
 
 	private def routes =
 		this.getClass.getMethods.toList.filter(_.getGenericReturnType == compareType).map(m=> (m.getName,m.getParameterTypes,m ) )
@@ -52,20 +52,19 @@ trait Specialization {
 						route._3.invoke(this, params.toSeq.asInstanceOf[Seq[Object]] : _* ).asInstanceOf[RoutableFuture]
 					} catch {
 						case e:Exception =>
-							spcializationLogger.log(Level.SEVERE,s"failing invocation of:$name",e)
-							println("resolved params")
-							println(params)
+							spcializationLogger.error(s"failing invocation of:$name",e)
+							spcializationLogger.debug("resolved params" + params)
 							Future.failed(new Throwable(s"failing invocation of:$name",e))
 
 					}
 				} else {
 					val msg = s"could not locate some parameters in state:${Specialization.getMissingParameters(paramNames, paramResolver).mkString(",")}"
-					spcializationLogger.log(Level.SEVERE,msg)
+					spcializationLogger.error(msg)
 					Future.failed(new Throwable(msg))
 				}
 
 			case None =>
-				spcializationLogger.log(Level.SEVERE,s"could not find method $name")
+				spcializationLogger.error(s"could not find method $name")
 				Future.failed(new Throwable(s"could not find method $name"))
 		}
 

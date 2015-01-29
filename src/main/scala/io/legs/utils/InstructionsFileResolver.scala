@@ -2,11 +2,11 @@ package io.legs.utils
 
 
 import java.io.File
-import java.util.logging.{Level, Logger}
+import grizzled.slf4j.Logger
 
 object InstructionsFileResolver {
 
-	lazy val logger = Logger.getLogger(this.getClass.getSimpleName)
+	lazy val logger = Logger(getClass)
 
 	private val folders = List( "../instructions/" )
 
@@ -22,7 +22,7 @@ object InstructionsFileResolver {
 				userFolders.find { folder => new File(s"$folder$name.json").exists() } match {
 					case Some(folder) => Some(scala.io.Source.fromFile(new File(s"$folder$name.json")).mkString)
 					case None=>
-            logger.log(Level.SEVERE,s"could not find instructions file named $name.json")
+						logger.error(s"could not find instructions file named $name.json")
 						None
 				}
 		}

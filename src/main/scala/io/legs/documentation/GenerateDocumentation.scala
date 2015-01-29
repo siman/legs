@@ -2,6 +2,7 @@ package io.legs.documentation
 
 import java.io.FileWriter
 
+import grizzled.slf4j.Logger
 import io.legs.Specialization
 import io.legs.Specialization._
 import io.legs.documentation.Annotations.{LegsFunctionAnnotation, LegsParamAnnotation}
@@ -9,6 +10,8 @@ import io.legs.documentation.Annotations.{LegsFunctionAnnotation, LegsParamAnnot
 import scala.concurrent.ExecutionContext
 
 object GenerateDocumentation {
+
+	val logger = Logger(getClass)
 
 	// TODO: add scala compiler to improve macro parsing into specific instance (using ToolBox
 	// http://docs.scala-lang.org/overviews/reflection/annotations-names-scopes.html
@@ -26,7 +29,7 @@ object GenerateDocumentation {
 	)
 
 	def main(args : Array[String]): Unit ={
-		println("starting generation of Legs.io library functions")
+		logger.info("starting generation of Legs.io library functions")
 
 		Specialization.registeredSpecializedClasses
 			.map(extractLegsFunctions) match {
@@ -35,7 +38,7 @@ object GenerateDocumentation {
 				val fw = new FileWriter("FUNCTIONS.md",false)
 				fw.write(generated)
 				fw.close()
-				println("finished writing docs.")
+				logger.info("finished writing docs.")
 		}
 
 	}

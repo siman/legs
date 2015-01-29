@@ -1,6 +1,6 @@
 package io.legs
 
-import java.util.logging.{Level, Logger}
+import grizzled.slf4j.Logger
 
 import akka.actor._
 import io.legs.Coordinator.{GetStats, JobFailed, JobSuccess, Stop}
@@ -26,7 +26,7 @@ class Coordinator(labels: List[String], numMaxWorkers: Int) extends Actor {
 		case Stop() => stop()
 		case GetStats => sender ! statistics
 		case JobFailed(jobId, message) =>
-			logger.log(Level.SEVERE,s"job failed:$jobId message:$message")
+			logger.error(s"job failed:$jobId message:$message")
 			workers = workers.filter(_ != sender)
 			statistics = statistics.failed
 			lookForWork()
@@ -34,9 +34,9 @@ class Coordinator(labels: List[String], numMaxWorkers: Int) extends Actor {
 			logger.info(s"succeeded jobId:$jobId")
 			workers = workers.filter(_ != sender)
 			statistics = statistics.succeeded
-			println(">>>>>>>>>>>>",statistics)
+			logger.debug("statistics:" + statistics)
 			lookForWork()
-		case unknown => println("coordinator received unknown message",unknown)
+		case unknown => logger.error("coordinator received unknown message:" + unknown.toString)
 	}
 
 	private def stop(){
@@ -58,7 +58,7 @@ class Coordinator(labels: List[String], numMaxWorkers: Int) extends Actor {
 					lookForWork()
 				}
 			case None =>
-				println("could not find job in the queue... going to sign unemployment")
+				logger.info("could not find job in the queue... going to sign unemployment")
 		}
 	}
 
@@ -90,7 +90,7 @@ object Coordinator {
 
 	val actorSystemName  = "LegsCoordinator"
 
-	lazy val logger = Logger.getLogger(this.getClass.getSimpleName)
+	lazy val logger = Logger(getClass)
 
 	def props(labels: List[String], numWorkers: Int) : Props = Props(new Coordinator(labels,numWorkers))
 

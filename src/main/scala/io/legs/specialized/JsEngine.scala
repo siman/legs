@@ -1,6 +1,6 @@
 package io.legs.specialized
 
-import java.util.logging.{Level, Logger}
+import grizzled.slf4j.Logger
 import javax.script.{Invocable, ScriptEngineManager}
 
 import io.legs.Specialization
@@ -11,7 +11,7 @@ import scala.concurrent._
 
 object JsEngine extends Specialization {
 
-	private lazy val logger = Logger.getLogger(this.getClass.getSimpleName)
+	private lazy val logger = Logger(this.getClass.getSimpleName)
 
 	type EmitMap = scala.collection.mutable.HashMap[String,List[Any]]
 
@@ -53,7 +53,7 @@ object JsEngine extends Specialization {
 				Yield(Some(reduced))
 			} catch {
 				case e : Throwable =>
-					logger.log(Level.SEVERE,"error while running map reduce",e)
+					logger.error("error while running map reduce",e)
 					throw e
 			}
 		}

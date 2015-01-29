@@ -1,6 +1,6 @@
 package io.legs.specialized
 
-import java.util.logging.Logger
+import grizzled.slf4j.Logger
 
 import io.legs.Specialization.{RoutableFuture, Yield}
 import io.legs._
@@ -14,7 +14,7 @@ import scala.concurrent.{ExecutionContext, Future}
  */
 object Tools extends Specialization {
 
-	val specializedBaseLogger = Logger.getLogger(this.getClass.getSimpleName)
+	val specializedBaseLogger = Logger(getClass)
 
 
 	@LegsFunctionAnnotation(
@@ -168,7 +168,7 @@ object Tools extends Specialization {
 	def ECHO(state:Specialization.State,
 		value:Any @LegsParamAnnotation("some provided value")
 	) : RoutableFuture = {
-		println(value)
+		specializedBaseLogger.info(value)
 		Future.successful(Yield(Some(value)))
 	}
 
