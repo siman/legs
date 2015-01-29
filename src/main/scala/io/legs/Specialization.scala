@@ -90,14 +90,14 @@ object Specialization {
 
 	import ActionTokenizer._
 
-	def executeStep(step: Step, state: State)(implicit willWait: Duration = waitFor) : RoutableFuture = {
+	def executeStep(step: Step, state: State, userSpecialized : List[Specialization] = Nil)(implicit willWait: Duration = waitFor) : RoutableFuture = {
 		try {
 			(getInputs(tokenized(step.action.toList)) match {
 				case m :: Nil => throw new Throwable("a step has to have at least a module and the command")
 				case m :: c :: xs if m.s.contains(".") => // check if the module name has already full path
 					(m.s, c.s, xs)
 				case c :: xs =>
-					val moduleName = registeredSpecializedClasses.find(sp =>
+					val moduleName = (registeredSpecializedClasses ::: userSpecialized ).find(sp =>
 						sp.getRoute(c.s, xs.length).isDefined
 					).getOrElse(throw new Throwable(s"could not resolve route for ${c.s} args:${step.action}"))
 					  .getClass.getName.replace("$", "")

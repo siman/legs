@@ -72,15 +72,15 @@ object Worker {
 
 	def props(coordinator: ActorRef, job:Job) : Props = Props(new Worker(coordinator,job))
 
-	def execute(jsonString: String, state:Map[String,Any] = Map()): Try[Yield] =
-		 Try { Await.result(executeAsync(jsonString, state),Duration("5 minutes")) }
+	def execute(jsonString: String, state:Map[String,Any] = Map(), userSpecialized : List[Specialization] = Nil): Try[Yield] =
+		 Try { Await.result(executeAsync(jsonString, state,userSpecialized),Duration("5 minutes")) }
 
-	def executeAsync(jsonString: String, state:Map[String,Any] = Map()): Future[Yield] = {
+	def executeAsync(jsonString: String, state:Map[String,Any] = Map(), userSpecialized : List[Specialization] = Nil): Future[Yield] = {
 
 		val steps = Step.from(jsonString)
 
 		try {
-			walk(steps, state)
+			walk(steps, state,userSpecialized)
 		} catch {
 			case e : TimeoutException => throw new Throwable("time ran out while working",e)
 			case e : Exception => throw e
@@ -92,10 +92,10 @@ object Worker {
 		lazy val stateAndYield = yielded ++ state
 	}
 
-	def walk(steps:List[Step],state:Map[String,Any] = Map()) : RoutableFuture =
+	def walk(steps:List[Step],state:Map[String,Any] = Map(),userSpecialized : List[Specialization] = Nil) : RoutableFuture =
 		steps match {
 			case x::xs =>
-				Specialization.executeStep(x,state).flatMap {
+				Specialization.executeStep(x,state,userSpecialized).flatMap {
 					case Yield(Some(yielded)) if x.transform.isDefined =>
 						val transformSteps =
 							Step.from(x.transform.get) match {

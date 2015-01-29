@@ -1,15 +1,15 @@
 import java.util.UUID
 
-import helpers.TestSpecializer
-import io.legs.Specialization.Yield
-import io.legs.{Specialization, Step}
+import helpers.{CustomSpecialized, TestSpecializer}
+import io.legs.Specialization._
+import io.legs.{Worker, Specialization, Step}
 import org.scalatest.FunSpec
 import org.scalatest.concurrent.AsyncAssertions
 import play.api.libs.json.{JsNumber, JsString}
 
-import scala.concurrent.Await
-import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.{Future, Await}
 import scala.concurrent.duration.Duration
+import scala.util.Success
 
 class SpecializationSpec extends FunSpec with AsyncAssertions {
 
@@ -54,6 +54,24 @@ class SpecializationSpec extends FunSpec with AsyncAssertions {
 			case bad =>
 				fail("bad result")
 		}
+	}
+
+
+
+	it("supports custom specializations provided implicitly in scope"){
+
+		val testValue = "thisandthat"
+		val customJson =
+			s"""
+			  |[{
+			  |	"action":"CUSTOM_THING/$${\\"$testValue\\"}"
+			  |}]
+			""".stripMargin
+
+		assertResult(Success(Yield(Some(testValue + "!")))){
+			Worker.execute(customJson,Map.empty[String,Any],CustomSpecialized :: Nil)
+		}
+
 	}
 
 }
