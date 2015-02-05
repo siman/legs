@@ -1,17 +1,18 @@
 package io.legs.specialized
 
-import grizzled.slf4j.Logger
 import javax.script.{Invocable, ScriptEngineManager}
 
+import com.typesafe.scalalogging.Logger
 import io.legs.Specialization
 import io.legs.Specialization.{RoutableFuture, Yield}
-import io.legs.documentation.Annotations.{LegsParamAnnotation, LegsFunctionAnnotation}
+import io.legs.documentation.Annotations.{LegsFunctionAnnotation, LegsParamAnnotation}
+import org.slf4j.LoggerFactory
 
 import scala.concurrent._
 
 object JsEngine extends Specialization {
 
-	private lazy val logger = Logger(this.getClass.getSimpleName)
+	private lazy val logger = Logger(LoggerFactory.getLogger(getClass))
 
 	type EmitMap = scala.collection.mutable.HashMap[String,List[Any]]
 

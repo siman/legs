@@ -2,16 +2,17 @@ package io.legs.documentation
 
 import java.io.FileWriter
 
-import grizzled.slf4j.Logger
+import com.typesafe.scalalogging.Logger
 import io.legs.Specialization
 import io.legs.Specialization._
 import io.legs.documentation.Annotations.{LegsFunctionAnnotation, LegsParamAnnotation}
+import org.slf4j.LoggerFactory
 
 import scala.concurrent.ExecutionContext
 
 object GenerateDocumentation {
 
-	val logger = Logger(getClass)
+	val logger = Logger(LoggerFactory.getLogger(getClass))
 
 	// TODO: add scala compiler to improve macro parsing into specific instance (using ToolBox
 	// http://docs.scala-lang.org/overviews/reflection/annotations-names-scopes.html

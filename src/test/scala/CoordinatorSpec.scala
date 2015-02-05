@@ -31,7 +31,6 @@ class CoordinatorSpec extends TestKit(ActorSystem("Step1PrimarySpec")) with FunS
 			implicit val t = akka.util.Timeout(2, TimeUnit.SECONDS) // needed for `?` below
 			val f = (coordActorRef ? Coordinator.GetStats).mapTo[CoordinatorStatistics]
 			val stats = Await.result(f, Duration("2 seconds"))
-			println(stats)
 			assertResult(true) { stats.lastWorkQueueCheck.isDefined }
 			coordActorRef ! Stop()
 		}

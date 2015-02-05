@@ -1,13 +1,13 @@
 package io.legs
 
-import grizzled.slf4j.Logger
-
 import akka.actor.{Actor, ActorRef, Props}
+import com.typesafe.scalalogging.Logger
 import io.legs.Coordinator.{JobFailed, JobSuccess}
 import io.legs.Specialization.{RoutableFuture, Yield}
 import io.legs.scheduling.{Job, JobType}
 import io.legs.specialized.Queue
 import io.legs.utils.InstructionsFileResolver
+import org.slf4j.LoggerFactory
 
 import scala.concurrent._
 import scala.concurrent.duration.Duration
@@ -68,7 +68,7 @@ object Worker {
 
 	case class StartWork()
 
-	private lazy val logger = Logger(this.getClass.getSimpleName)
+	private lazy val logger = Logger(LoggerFactory.getLogger(getClass))
 
 	def props(coordinator: ActorRef, job:Job) : Props = Props(new Worker(coordinator,job))
 

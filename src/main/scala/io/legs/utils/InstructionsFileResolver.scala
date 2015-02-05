@@ -1,12 +1,13 @@
 package io.legs.utils
 
-
 import java.io.File
-import grizzled.slf4j.Logger
+
+import com.typesafe.scalalogging.Logger
+import org.slf4j.LoggerFactory
 
 object InstructionsFileResolver {
 
-	lazy val logger = Logger(getClass)
+	lazy val logger = Logger(LoggerFactory.getLogger(getClass))
 
 	private val folders = List( "../instructions/" )
 

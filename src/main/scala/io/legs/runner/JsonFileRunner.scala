@@ -1,15 +1,14 @@
 package io.legs.runner
 
-import java.io.File
-
-import grizzled.slf4j.Logger
+import com.typesafe.scalalogging.Logger
 import io.legs.Worker
+import org.slf4j.LoggerFactory
 
 import scala.util.{Failure, Success}
 
 object JsonFileRunner {
 
-	val logger = Logger(getClass)
+	val logger = Logger(LoggerFactory.getLogger(getClass))
 
 	def main(args : Array[String]): Unit ={
 
@@ -31,10 +30,8 @@ object JsonFileRunner {
 			val jsonStr = scala.io.Source.fromFile(input("file").get,"UTF-8").mkString
 
 			Worker.execute(jsonStr) match {
-				case Success(v) =>
-					logger.info("last yield:")
-					logger.info(v)
-				case Failure(e) => logger.info(e)
+				case Success(v) => logger.info("last yield:",v)
+				case Failure(e) => logger.info("failed executing json Str",e)
 			}
 		} else {
 			logger.error("did not understand input:\"" + args.mkString(" ") + "\"")

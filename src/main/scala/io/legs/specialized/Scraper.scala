@@ -1,18 +1,19 @@
 package io.legs.specialized
 
 import java.io.StringReader
-import grizzled.slf4j.Logger
 import javax.xml.transform.stream.StreamSource
 
+import com.typesafe.scalalogging.Logger
 import io.legs.Specialization
 import io.legs.Specialization.{RoutableFuture, Yield}
-import io.legs.documentation.Annotations.{LegsParamAnnotation, LegsFunctionAnnotation}
+import io.legs.documentation.Annotations.{LegsFunctionAnnotation, LegsParamAnnotation}
 import io.legs.network.Communicator
 import io.legs.network.simple.SimpleCommunicator
 import net.sf.saxon.s9api.Processor
 import org.htmlcleaner.{DomSerializer, HtmlCleaner}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
+import org.slf4j.LoggerFactory
 
 import scala.collection.immutable.::
 import scala.concurrent._
@@ -25,7 +26,7 @@ object SimpleScraper extends Scraper {
 
 trait Scraper extends Specialization {
 
-	private lazy val logger = Logger(this.getClass)
+	private lazy val logger = Logger(LoggerFactory.getLogger(getClass))
 
 	def communicator: Communicator
 

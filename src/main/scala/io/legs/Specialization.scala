@@ -1,11 +1,12 @@
 package io.legs
 
 import java.util.UUID
-import grizzled.slf4j.Logger
 
+import com.typesafe.scalalogging.Logger
 import io.legs.specialized._
-import io.legs.utils.{ActionTokenizer, JsonFriend}
-import play.api.libs.json.{Json, JsValue}
+import io.legs.utils.JsonFriend
+import org.slf4j.LoggerFactory
+import play.api.libs.json.{JsValue, Json}
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{ExecutionContext, Future}
@@ -15,7 +16,7 @@ trait Specialization {
 
 	import io.legs.Specialization._
 
-	private lazy val spcializationLogger = Logger(getClass)
+	private lazy val spcializationLogger = Logger(LoggerFactory.getLogger(getClass))
 
 	private def routes =
 		this.getClass.getMethods.toList.filter(_.getGenericReturnType == compareType).map(m=> (m.getName,m.getParameterTypes,m ) )
@@ -87,7 +88,7 @@ object Specialization {
 
 	lazy val registeredSpecializedClasses = List(LinkTracker,JsonSpecialized,Numbers,Persistor,Queue,SimpleScraper,Strings,Tools,WebDriver,JsEngine)
 
-	import ActionTokenizer._
+	import io.legs.utils.ActionTokenizer._
 
 	def executeStep(step: Step, state: State, userSpecialized : List[Specialization] = Nil)(implicit willWait: Duration = waitFor) : RoutableFuture = {
 		try {

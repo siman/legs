@@ -1,7 +1,8 @@
 package io.legs
 
+import com.typesafe.scalalogging.Logger
+import org.slf4j.LoggerFactory
 import play.api.libs.json._
-import grizzled.slf4j.Logger
 
 case class Step (
 	action: String,
@@ -14,7 +15,7 @@ object Step {
 
 	implicit val fmt = Json.format[Step]
 
-	val logger = Logger(this.getClass.getSimpleName)
+	val logger = Logger(LoggerFactory.getLogger(getClass))
 
 	def from(jsonArray : JsArray) : List[Step] =
 		jsonArray.value.toList.map(v=> fmt.reads(v).getOrElse(

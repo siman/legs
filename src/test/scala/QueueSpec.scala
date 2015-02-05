@@ -38,7 +38,7 @@ class QueueSpec extends FunSpec with AsyncAssertions with BeforeAndAfter {
 
 		Await.result(Queue.persistJob(Queue.getSchedulerJob),Duration(2, "seconds"))
 
-		RedisProvider.blocking[Option[String]] {
+		RedisProvider.blockingRedis[Option[String]] {
 			_.hget[String](Queue.jobsData_HS, Queue.getSchedulerJob.id)
 		} match {
 			case None => fail("did not get seeded queue job")
@@ -54,7 +54,7 @@ class QueueSpec extends FunSpec with AsyncAssertions with BeforeAndAfter {
 			Map("when" -> Queue.Plans.oncePerHour, "jobID" -> "100")
 		), Duration("5 seconds"))
 
-		RedisProvider.blocking[Map[String,String]] {
+		RedisProvider.blockingRedis[Map[String,String]] {
 			_.hgetall[String](Queue.schedulePlansKey_HS)
 		}.size match {
 			case 1 => assertResult(1) { 1 }
@@ -72,7 +72,7 @@ class QueueSpec extends FunSpec with AsyncAssertions with BeforeAndAfter {
 			Map("jobID" -> "100")
 		), Duration("5 seconds"))
 
-		RedisProvider.blocking {
+		RedisProvider.blockingRedis {
 			_.zrange(Queue.queueByLabelKey_ZL(Queue.getSchedulerJob.labels.head),0, -1)
 		}.length match {
 			case 2 => assertResult(2) { 2 }
@@ -85,7 +85,7 @@ class QueueSpec extends FunSpec with AsyncAssertions with BeforeAndAfter {
 		Await.result(Queue.setupRedis(), Duration(2, "seconds"))
 		Queue.queueAll()
 
-		RedisProvider.blocking{
+		RedisProvider.blockingRedis{
 			_.zrange(Queue.queueByLabelKey_ZL(Queue.getSchedulerJob.labels.head),0, -1)
 		}.length match {
 			case 2 => // good
@@ -107,14 +107,14 @@ class QueueSpec extends FunSpec with AsyncAssertions with BeforeAndAfter {
 		Queue.persistJob(testJob)
 		Queue.queueJobImmediately(testJob)
 
-		RedisProvider.blocking {
+		RedisProvider.blockingRedis {
 			_.zrange(Queue.queueByLabelKey_ZL(testJobLabel),0, -1)
 		}.length match {
 			case 1 => // good
 			case _ => fail("did not get good result")
 		}
 
-		RedisProvider.blocking {
+		RedisProvider.blockingRedis {
 			_.zrange(Queue.queueWorkingByLabelKey_ZL(testJobLabel),0, -1)
 		}.length match {
 			case 0 => // good
@@ -123,14 +123,14 @@ class QueueSpec extends FunSpec with AsyncAssertions with BeforeAndAfter {
 
 		Queue.getNextJobFromQueue(List(testJobLabel))
 
-		RedisProvider.blocking {
+		RedisProvider.blockingRedis {
 			_.zrange(Queue.queueByLabelKey_ZL(testJobLabel),0, -1)
 		}.length match {
 			case 0 => // good
 			case _ => fail("did not get good result")
 		}
 
-		RedisProvider.blocking {
+		RedisProvider.blockingRedis {
 			_.zrange(Queue.queueWorkingByLabelKey_ZL(testJobLabel),0, -1)
 		}.length match {
 			case 1 => //good
@@ -150,13 +150,13 @@ class QueueSpec extends FunSpec with AsyncAssertions with BeforeAndAfter {
 		Queue.deleteJob(jobOpt.get)
 
 		assertResult(None) {
-			RedisProvider.blocking { _.zrank(Queue.queueByLabelKey_ZL(testJobLabel),jobOpt.get.id) }
+			RedisProvider.blockingRedis { _.zrank(Queue.queueByLabelKey_ZL(testJobLabel),jobOpt.get.id) }
 		}
 		assertResult(None) {
-			RedisProvider.blocking { _.zrank(Queue.queueDeferredByLabelKey_ZL(testJobLabel),jobOpt.get.id) }
+			RedisProvider.blockingRedis { _.zrank(Queue.queueDeferredByLabelKey_ZL(testJobLabel),jobOpt.get.id) }
 		}
 		assertResult(None) {
-			RedisProvider.blocking { _.zrank(Queue.queueWorkingByLabelKey_ZL(testJobLabel),jobOpt.get.id) }
+			RedisProvider.blockingRedis { _.zrank(Queue.queueWorkingByLabelKey_ZL(testJobLabel),jobOpt.get.id) }
 		}
 		assertResult(None) {
 			Queue.getJob(jobOpt.get.id)
@@ -166,7 +166,7 @@ class QueueSpec extends FunSpec with AsyncAssertions with BeforeAndAfter {
 
 		assertResult(None) { Queue.getJob(Queue.getSchedulerJob.id) }
 		assertResult(None) {
-			RedisProvider.blocking { _.hget(Queue.schedulePlansKey_HS,jobOpt.get.id) }
+			RedisProvider.blockingRedis { _.hget(Queue.schedulePlansKey_HS,jobOpt.get.id) }
 		}
 
 	}

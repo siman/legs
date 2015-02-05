@@ -3,8 +3,13 @@ package io.legs.utils
 import com.typesafe.config.ConfigFactory
 import java.io.File
 
+import com.typesafe.scalalogging.Logger
+import org.slf4j.LoggerFactory
+
 
 object Config {
+
+	private lazy val log = Logger(LoggerFactory.getLogger(getClass))
 
 	object Env extends Enumeration {
 		type Env = Value
@@ -13,9 +18,18 @@ object Config {
 
 	import Env._
 
-	private var env = Env.DEV
+	var env =
+		if (null != System.getProperty("isTest")) Env.TEST
+		else
+			if (System.getenv("LEGS_UI_ENV") == "production") Env.PRODUCTION
+			else Env.DEV
 
-	def setEnv(newEnv : Env.Value) = env = newEnv
+	log.info("initial config env:" + env.toString)
+
+	def setEnv(newEnv : Env.Value) = env = {
+		log.info("changing config env to:" + newEnv.toString)
+		newEnv
+	}
 
 	def getParam(name: String) : Option[String] =
 		if (getConfig.hasPath(getPrefix + "." + name)) Some(getConfig.getString(getPrefix + "." + name))

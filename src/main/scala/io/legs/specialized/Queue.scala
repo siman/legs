@@ -1,14 +1,15 @@
 package io.legs.specialized
 
-import grizzled.slf4j.Logger
-
+import com.typesafe.scalalogging.Logger
 import com.uniformlyrandom.scron.Scron
 import io.legs.Specialization
 import io.legs.Specialization.{RoutableFuture, Yield}
-import io.legs.documentation.Annotations.{LegsParamAnnotation, LegsFunctionAnnotation}
+import io.legs.documentation.Annotations.{LegsFunctionAnnotation, LegsParamAnnotation}
 import io.legs.scheduling.{Job, JobStatus, JobType, Priority}
+import io.legs.utils.RedisProvider._
 import io.legs.utils.{EnumJson, JsonFriend, RedisProvider}
 import org.joda.time.{DateTime, DateTimeZone}
+import org.slf4j.LoggerFactory
 import play.api.libs.json.{JsString, Json}
 import redis.api.scripting.RedisScript
 import redis.protocol.{Bulk, RedisReply}
@@ -17,7 +18,7 @@ import scala.concurrent._
 
 object Queue extends Specialization {
 
-	private lazy val logger = Logger(this.getClass)
+	private lazy val logger = Logger(LoggerFactory.getLogger(getClass))
 
 	final val jobsData_HS = "legs:jobs"
 	final val jobsCounterKey_S = "legs:jobs:counter"
@@ -52,16 +53,16 @@ object Queue extends Specialization {
 
 	private val setupRedisLua =
 		s"""
-		  |local jobsCounterKey = '$jobsCounterKey_S'
-		  |local jobId = ${getSchedulerJob.id}
-		  |
-		  |if not redis.call('GET', jobsCounterKey) then
-		  |	redis.call('SET', jobsCounterKey, '$jobsStartValue')
-		  |end
-		  |
-		  |if not redis.call('HGET', '$jobsData_HS', jobId ) then
-		  |	redis.call('HSET', '$jobsData_HS', jobId, '${Json.toJson(getSchedulerJob).toString()}')
-		  |end
+			|local jobsCounterKey = '$jobsCounterKey_S'
+			|local jobId = ${getSchedulerJob.id}
+			|
+			|if not redis.call('GET', jobsCounterKey) then
+			|	redis.call('SET', jobsCounterKey, '$jobsStartValue')
+			|end
+			|
+			|if not redis.call('HGET', '$jobsData_HS', jobId ) then
+			|	redis.call('HSET', '$jobsData_HS', jobId, '${Json.toJson(getSchedulerJob).toString()}')
+			|end
 		""".stripMargin
 
 	def setupRedis() = {
@@ -77,13 +78,18 @@ object Queue extends Specialization {
 		persistJobQueue(job, DateTime.now(DateTimeZone.UTC).getMillis)
 
 
+	def getJobAsync(id : String)(implicit ec : ExecutionContext) : Future[Option[Job]] =
+		asyncRedis(_.hget[String](jobsData_HS,id)
+			map { _.map( jobString => Json.parse(jobString).as[Job] ) } )
+
+
 	def getJob(id: String) : Option[Job] =
-		RedisProvider.blocking
-		{ _.hget[String](jobsData_HS,id) } match {
-			case Some(jobString) =>
-				Json.parse(jobString).asOpt[Job]
-			case None => None
-		}
+		RedisProvider.blockingRedis
+			{ _.hget[String](jobsData_HS,id) } match {
+				case Some(jobString) =>
+					Json.parse(jobString).asOpt[Job]
+				case None => None
+			}
 
 	def deleteJob(job: Job) {
 
@@ -105,18 +111,18 @@ object Queue extends Specialization {
 	}
 
 	private def getScheduleForJob(id : String) : Option[String] =
-		RedisProvider.blocking {
+		RedisProvider.blockingRedis {
 			_.hget[String](schedulePlansKey_HS, id)
 		}
 
 
 	def getAllScheduledJobs =
-		RedisProvider.blocking {
+		RedisProvider.blockingRedis {
 			_.hgetall[String](schedulePlansKey_HS)
 		}
 
 	def getNextJobId : String =
-		RedisProvider.blocking {
+		RedisProvider.blockingRedis {
 			_.incr(jobsCounterKey_S)
 		}.toString
 
@@ -197,7 +203,7 @@ object Queue extends Specialization {
 
 	def getNextJobFromQueue(labels: List[String]) : Option[Job] = {
 		logger.info(s"getting next job from queue for labels:${labels.mkString(",")}")
-		RedisProvider.blocking[RedisReply] {
+		RedisProvider.blockingRedis[RedisReply] {
 			_.evalshaOrEval(nextJobFromQueueLua,Nil,Seq(Json.toJson(labels).toString(),DateTime.now(DateTimeZone.UTC).getMillis.toString))
 		} match {
 			case b: Bulk => b.toOptString.map(s=>Json.parse(s.toString).as[Job])
@@ -221,7 +227,7 @@ object Queue extends Specialization {
 			val inputKeys =  inputIndices.map(_.value)
 			if (inputKeys.filterNot(i => state.keys.exists(i.equals)).nonEmpty){
 				throw new Exception("could not find all input values in state, missing:"
-						+ inputKeys.filterNot(i=>state.keys.exists(i.equals)).mkString(",") )
+					+ inputKeys.filterNot(i=>state.keys.exists(i.equals)).mkString(",") )
 			} else {
 				val inputs = inputKeys.zip(inputKeys.map(iName=> JsonFriend.jsonify(state(iName)))).toMap
 

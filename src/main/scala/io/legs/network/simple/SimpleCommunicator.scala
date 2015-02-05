@@ -1,6 +1,6 @@
 package io.legs.network.simple
 
-import grizzled.slf4j.Logger
+import com.typesafe.scalalogging.Logger
 import io.legs.network.Communicator
 import io.legs.utils.UserAgents
 import org.jsoup.Jsoup
@@ -14,10 +14,12 @@ import org.apache.tika.detect.AutoDetectReader
 import java.nio.charset.Charset
 import java.nio.ByteBuffer
 
+import org.slf4j.LoggerFactory
+
 
 object SimpleCommunicator extends Communicator {
 
-	val logger = Logger(getClass)
+	val logger = Logger(LoggerFactory.getLogger(getClass))
 
 	def getHtmlStr(url: String): String = {
 		val doc = Jsoup.connect(url).userAgent(UserAgents.getRandom).timeout(100000).get()
@@ -50,7 +52,7 @@ object SimpleCommunicator extends Communicator {
 
 		} catch {
 			case e: Throwable =>
-				logger.error(e)
+				logger.error(s"failed fetching url:$url",e)
 				""
 		}
 

@@ -1,12 +1,12 @@
 package io.legs
 
-import grizzled.slf4j.Logger
-
 import akka.actor._
+import com.typesafe.scalalogging.Logger
 import io.legs.Coordinator.{GetStats, JobFailed, JobSuccess, Stop}
 import io.legs.Worker.StartWork
 import io.legs.scheduling.Job
 import io.legs.specialized.Queue
+import org.slf4j.LoggerFactory
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
@@ -90,7 +90,7 @@ object Coordinator {
 
 	val actorSystemName  = "LegsCoordinator"
 
-	lazy val logger = Logger(getClass)
+	lazy val logger = Logger(LoggerFactory.getLogger(getClass))
 
 	def props(labels: List[String], numWorkers: Int) : Props = Props(new Coordinator(labels,numWorkers))
 
