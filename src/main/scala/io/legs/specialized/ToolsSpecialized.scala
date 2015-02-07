@@ -12,7 +12,7 @@ import scala.concurrent.{ExecutionContext, Future}
 /**
  * Created: 6/11/13 4:53 PM
  */
-object Tools extends Specialization {
+object ToolsSpecialized extends Specialization {
 
 	val specializedBaseLogger = Logger(LoggerFactory.getLogger(getClass))
 

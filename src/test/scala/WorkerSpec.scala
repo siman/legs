@@ -17,7 +17,7 @@ class WorkerSpec extends FunSpec with AsyncAssertions with Eventually {
 		val instructions= s"""
 			  |[
 			  |	{
-			  | 	"action":"io.legs.specialized.Tools/MAP_PAR/overP/toP/instructionsP",
+			  | 	"action":"MAP_PAR/overP/toP/instructionsP",
 			  |  	"values": {
 			  |   		"overP": [1,2,3,4,5,6,7,8,9,10],
 			  |     	"toP": "num",
@@ -86,7 +86,7 @@ class WorkerSpec extends FunSpec with AsyncAssertions with Eventually {
 		val instructions= s"""
 			  |[
 			  |	{
-			  | 	"action":"io.legs.specialized.Tools/MAP_PAR/$${[1,2,3,4,5,6,7,8,9,10]}/$${\\"num\\"}/instructionsP",
+			  | 	"action":"MAP_PAR/$${[1,2,3,4,5,6,7,8,9,10]}/$${\\"num\\"}/instructionsP",
 			  |  	"values": {
 			  |      	"instructionsP":[
 			  |       		{

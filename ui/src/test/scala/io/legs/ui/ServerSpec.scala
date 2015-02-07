@@ -1,6 +1,6 @@
 package io.legs.ui
 
-import io.legs.specialized.Queue
+import io.legs.specialized.QueueSpecialized
 import io.legs.ui.server.model.Jobs
 import io.legs.utils.RedisProvider
 import org.scalatest.{BeforeAndAfter, FunSpec}
@@ -23,7 +23,6 @@ class ServerSpec extends FunSpec with BeforeAndAfter {
 			assertResult(Nil){
 				Await.result(Jobs.getScheduledJobs(),duration)
 			}
-
 
 
 		}

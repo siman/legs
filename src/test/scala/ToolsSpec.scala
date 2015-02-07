@@ -1,7 +1,7 @@
 import helpers.TestSpecializer
 import io.legs.Specialization.Yield
 import io.legs.{Step, Specialization}
-import io.legs.specialized.Tools
+import io.legs.specialized.ToolsSpecialized
 import java.util.UUID
 import org.scalatest.FunSpec
 import play.api.libs.json.{JsNumber, JsString, JsArray, Json}
@@ -45,7 +45,7 @@ class ToolsSpec extends FunSpec  {
 			 """.stripMargin
 
 		Await.result(
-			Tools.LOOP_WHILE(
+			ToolsSpecialized.LOOP_WHILE(
 				Map(),
 				Json.parse(check).as[JsArray],
 				Json.parse(loop).as[JsArray]),
@@ -58,7 +58,7 @@ class ToolsSpec extends FunSpec  {
 	it("checks for mandatory values and fails when one is missing"){
 		assertResult(true) {
 			try {
-				Await.result(Tools.VERIFY_VALUES(Map("item1" -> 1,"item2" -> 2,"item3" -> 3),List(JsString("item1"),JsString("item2"),JsString("item3"),JsString("missing"))),Duration("5 seconds"))
+				Await.result(ToolsSpecialized.VERIFY_VALUES(Map("item1" -> 1,"item2" -> 2,"item3" -> 3),List(JsString("item1"),JsString("item2"),JsString("item3"),JsString("missing"))),Duration("5 seconds"))
 				false
 			} catch {
 				case e : Throwable => true
@@ -77,7 +77,7 @@ class ToolsSpec extends FunSpec  {
 
 	ignore("checks for mandatory values and succeeds when all are present"){
 		assertResult(true) {
-			Await.result(Tools.VERIFY_VALUES(Map("item1" -> 1,"item2" -> 2,"item3" -> 3),List(JsString("item1"),JsString("item2"),JsString("item3"))),Duration("5 seconds")).valueOpt.isDefined
+			Await.result(ToolsSpecialized.VERIFY_VALUES(Map("item1" -> 1,"item2" -> 2,"item3" -> 3),List(JsString("item1"),JsString("item2"),JsString("item3"))),Duration("5 seconds")).valueOpt.isDefined
 		}
 	}
 

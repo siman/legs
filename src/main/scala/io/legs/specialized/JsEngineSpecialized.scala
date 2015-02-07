@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory
 
 import scala.concurrent._
 
-object JsEngine extends Specialization {
+object JsEngineSpecialized extends Specialization {
 
 	private lazy val logger = Logger(LoggerFactory.getLogger(getClass))
 

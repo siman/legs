@@ -1,6 +1,6 @@
 
 import helpers.TestSpecializer
-import io.legs.specialized.Tools
+import io.legs.specialized.ToolsSpecialized
 import org.scalatest.FunSpec
 import org.scalatest.concurrent.{AsyncAssertions, Eventually}
 import org.scalatest.time.{Seconds, Span}
@@ -16,7 +16,7 @@ class BaseSpecializedWorkerSpec extends FunSpec with AsyncAssertions with Eventu
 
 		val instructions = s"""[{"action":"helpers.TestSpecializer/incr/aParam"}]"""
 
-		Tools.invokeAction("MAP_PAR", List("over", "toParam", "instructions"), Map(),
+		ToolsSpecialized.invokeAction("MAP_PAR", List("over", "toParam", "instructions"), Map(),
 			Map("over" -> JsArray((1 to 10).map(_.toString).map(JsString).toSeq), "toParam" -> JsString("aParam"), "instructions" -> Json.parse(instructions)))
 
 

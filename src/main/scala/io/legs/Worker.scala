@@ -5,7 +5,7 @@ import com.typesafe.scalalogging.Logger
 import io.legs.Coordinator.{JobFailed, JobSuccess}
 import io.legs.Specialization.{RoutableFuture, Yield}
 import io.legs.scheduling.{Job, JobType}
-import io.legs.specialized.Queue
+import io.legs.specialized.QueueSpecialized
 import io.legs.utils.InstructionsFileResolver
 import org.slf4j.LoggerFactory
 
@@ -39,7 +39,7 @@ class Worker(coordinator: ActorRef, job: Job) extends Actor {
 		job.jobType match {
 			case JobType.SCHEDULED_CHILD | JobType.AD_HOC  =>
 				logger.info(s"cleaning up ${job.jobType} jobId:${job.id} ")
-				Queue.deleteJob(job)
+				QueueSpecialized.deleteJob(job)
 			case ignore =>
 		}
 		coordinator ! JobSuccess(job.id)
@@ -49,7 +49,7 @@ class Worker(coordinator: ActorRef, job: Job) extends Actor {
 	private def workerFail(message:String, e:Option[Throwable] = None){
 		if (e.isDefined) logger.error(s"failing jobId:${job.id}  with message:$message",e.get)
 		else logger.warn("failing jobId:${job.id}  with message:$message")
-		Queue.retryJob(job)
+		QueueSpecialized.retryJob(job)
 		coordinator ! JobFailed(job.id, message)
 		stop()
 	}

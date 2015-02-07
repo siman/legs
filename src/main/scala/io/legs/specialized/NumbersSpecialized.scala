@@ -6,7 +6,7 @@ import io.legs.documentation.Annotations.{LegsParamAnnotation, LegsFunctionAnnot
 
 import scala.concurrent.Future
 
-object Numbers extends Specialization {
+object NumbersSpecialized extends Specialization {
 
 	@LegsFunctionAnnotation(
 		details = "generated a list of numbers",

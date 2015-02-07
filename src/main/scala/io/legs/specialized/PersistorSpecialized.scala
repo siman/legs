@@ -9,7 +9,7 @@ import play.api.libs.json._
 
 import scala.concurrent._
 
-object Persistor extends Specialization {
+object PersistorSpecialized extends Specialization {
 
 	object WriteSyncObj
 
@@ -54,7 +54,7 @@ object Persistor extends Specialization {
 		Future {
 			WriteSyncObj.synchronized {
 				val writer = new FileWriter(filePath,true)
-				val objStr = Tools.constructJson(state, keys)
+				val objStr = ToolsSpecialized.constructJson(state, keys)
 				writer.write(objStr)
 				writer.close()
 			}

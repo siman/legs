@@ -1,7 +1,7 @@
 import io.legs.Specialization
 import io.legs.Specialization.Yield
 import io.legs.network.Communicator
-import io.legs.specialized.{Scraper, SimpleScraper}
+import io.legs.specialized.{BaseScraperSpecialized, SimpleScraperSpecialized}
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.concurrent.AsyncAssertions
 import org.scalatest.{FunSpec, ParallelTestExecution}
@@ -32,7 +32,7 @@ class ScraperSpec extends FunSpec with MockFactory with AsyncAssertions with Par
 
 		(tcm.getHtmlStr _).expects(url1).returning(data1)
 
-		object Obj extends Scraper {
+		object Obj extends BaseScraperSpecialized {
 			val communicator = tcm
 		}
 
@@ -51,7 +51,7 @@ class ScraperSpec extends FunSpec with MockFactory with AsyncAssertions with Par
 	it("can extract content from a string"){
 		val tcm = mock[Communicator]
 
-		object Obj extends Scraper {
+		object Obj extends BaseScraperSpecialized {
 			val communicator = tcm
 		}
 
@@ -69,7 +69,7 @@ class ScraperSpec extends FunSpec with MockFactory with AsyncAssertions with Par
 
 		val tcm = mock[Communicator]
 
-		object Obj extends Scraper {
+		object Obj extends BaseScraperSpecialized {
 			val communicator = tcm
 		}
 
@@ -89,7 +89,7 @@ class ScraperSpec extends FunSpec with MockFactory with AsyncAssertions with Par
 	it("extracts data from html using xpath"){
 		val tcm = mock[Communicator]
 
-		object Obj extends Scraper {
+		object Obj extends BaseScraperSpecialized {
 			val communicator = tcm
 		}
 
@@ -104,7 +104,7 @@ class ScraperSpec extends FunSpec with MockFactory with AsyncAssertions with Par
 
 	it("extracts nodes from XML"){
 		val inputFileStr = scala.io.Source.fromFile(new java.io.File("src/test/scala/helpers/test.xml")).mkString
-		val resFuture = SimpleScraper.invokeAction("EXTRACT_XML_XPATH",List("input","selector","validator"),Map(),
+		val resFuture = SimpleScraperSpecialized.invokeAction("EXTRACT_XML_XPATH",List("input","selector","validator"),Map(),
 			Map("input"->JsString(inputFileStr),"selector" -> JsString("//_links"), "validator" -> JsString("")))
 
 		assertResult(4) {
@@ -116,7 +116,7 @@ class ScraperSpec extends FunSpec with MockFactory with AsyncAssertions with Par
 	it ("resolves XML with w3c resolvable value"){
 		val inputXml = scala.io.Source.fromFile(new java.io.File("src/test/scala/helpers/dtdxml.xml")).mkString
 
-		val resFuture = SimpleScraper.invokeAction("EXTRACT_XML_XPATH",List("input","selector","validator"),Map(),
+		val resFuture = SimpleScraperSpecialized.invokeAction("EXTRACT_XML_XPATH",List("input","selector","validator"),Map(),
 			Map("input"->JsString(inputXml),"selector" -> JsString("//_links"), "validator" -> JsString("")))
 
 		assertResult(1) {

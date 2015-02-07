@@ -86,7 +86,7 @@ object Specialization {
 
 	implicit val waitFor = Duration(60, "second")
 
-	lazy val registeredSpecializedClasses = List(LinkTracker,JsonSpecialized,Numbers,Persistor,Queue,SimpleScraper,Strings,Tools,WebDriver,JsEngine)
+	lazy val registeredSpecializedClasses = List(LinkTrackerSpecialized,JsonSpecialized,NumbersSpecialized,PersistorSpecialized,QueueSpecialized,SimpleScraperSpecialized,StringsSpecialized,ToolsSpecialized,WebDriverSpecialized,JsEngineSpecialized)
 
 	import io.legs.utils.ActionTokenizer._
 

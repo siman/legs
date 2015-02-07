@@ -19,12 +19,12 @@ import scala.collection.immutable.::
 import scala.concurrent._
 
 
-object SimpleScraper extends Scraper {
+object SimpleScraperSpecialized extends BaseScraperSpecialized {
 	val communicator = SimpleCommunicator
 }
 
 
-trait Scraper extends Specialization {
+trait BaseScraperSpecialized extends Specialization {
 
 	private lazy val logger = Logger(LoggerFactory.getLogger(getClass))
 

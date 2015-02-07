@@ -4,7 +4,7 @@ import akka.actor.ActorSystem
 import akka.pattern.ask
 import akka.testkit.TestKit
 import io.legs.Coordinator.Stop
-import io.legs.specialized.Queue
+import io.legs.specialized.QueueSpecialized
 import io.legs.utils.RedisProvider
 import io.legs.{Coordinator, CoordinatorStatistics}
 import org.scalatest.concurrent.{AsyncAssertions, Eventually}
@@ -23,8 +23,8 @@ class CoordinatorSpec extends TestKit(ActorSystem("Step1PrimarySpec")) with FunS
 
 	it("starts and finds a job for its worker6"){
 
-		Await.result( Queue.setupRedis(), Duration("10 seconds") )
-		Await.result( Queue.queueAll(),Duration("10 seconds") )
+		Await.result( QueueSpecialized.setupRedis(), Duration("10 seconds") )
+		Await.result( QueueSpecialized.queueAll(),Duration("10 seconds") )
 
 		val coordActorRef = Coordinator.start(List("scheduler"),1)
 

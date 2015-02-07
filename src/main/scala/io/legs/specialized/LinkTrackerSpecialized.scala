@@ -7,7 +7,7 @@ import io.legs.utils.RedisProvider._
 
 import scala.concurrent._
 
-object LinkTracker extends Specialization {
+object LinkTrackerSpecialized extends Specialization {
 
 	final val linkTrackerPrefix_S = "legs:link_tracker:domain:"
 	final def linkTrackerKey_S(domain: String) = s"$linkTrackerPrefix_S$domain"

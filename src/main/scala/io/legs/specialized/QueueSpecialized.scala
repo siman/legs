@@ -16,7 +16,7 @@ import redis.protocol.Bulk
 
 import scala.concurrent._
 
-object Queue extends Specialization {
+object QueueSpecialized extends Specialization {
 
 	private lazy val logger = Logger(LoggerFactory.getLogger(getClass))
 
@@ -78,7 +78,7 @@ object Queue extends Specialization {
 		asyncRedis( _.hget[String](schedulePlansKey_HS, id) )
 
 
-	private def getAllScheduledJobs()(implicit ec : ExecutionContext) =
+	def getJobsSchedules()(implicit ec : ExecutionContext) =
 		asyncRedis( _.hgetall[String](schedulePlansKey_HS) )
 
 	private def persistJobQueue(job: Job, timeMillis: Long)(implicit ec : ExecutionContext) : Future[Unit] = {
@@ -88,7 +88,6 @@ object Queue extends Specialization {
 				rds.zadd(queueByLabelKey_ZL(label), (timeMillis.toDouble, job.id))
 			)
 		)}.map(_=> Unit)
-
 	}
 
 	private lazy val nextJobFromQueueLua = RedisScript(s"""
@@ -274,7 +273,7 @@ object Queue extends Specialization {
 
 	def queueAll()(implicit ctx : ExecutionContext) : Future[Unit] = {
 		logger.info("queueing all scheduled jobs")
-		getAllScheduledJobs.flatMap {
+		getJobsSchedules.flatMap {
 			case schedules =>
 				Future.sequence(schedules.keys.map { jobId =>
 					Job.get(jobId).flatMap {

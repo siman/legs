@@ -6,7 +6,7 @@ import io.legs.documentation.Annotations.{LegsParamAnnotation, LegsFunctionAnnot
 
 import scala.concurrent._
 
-object Strings extends Specialization {
+object StringsSpecialized extends Specialization {
 
 
 	@LegsFunctionAnnotation(

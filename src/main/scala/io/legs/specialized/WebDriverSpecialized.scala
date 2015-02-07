@@ -14,7 +14,7 @@ import org.openqa.selenium.support.ui.{ExpectedConditions, Select, WebDriverWait
 
 import scala.concurrent._
 
-object WebDriver extends Specialization {
+object WebDriverSpecialized extends Specialization {
 
 	// selenium guides
 	//http://docs.seleniumhq.org/docs/03_webdriver.jsp#user-input-filling-in-forms

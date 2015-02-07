@@ -1,5 +1,5 @@
 import io.legs.Specialization.Yield
-import io.legs.specialized.JsEngine
+import io.legs.specialized.JsEngineSpecialized
 import org.scalatest.FunSpec
 import play.api.libs.json.JsString
 
@@ -36,7 +36,7 @@ class JSEngineSpec extends FunSpec {
 			""".stripMargin
 		)
 
-		val f = JsEngine.invokeAction("MAP_REDUCE",List("collection","map","reduce"),Map("collection" -> collection)
+		val f = JsEngineSpecialized.invokeAction("MAP_REDUCE",List("collection","map","reduce"),Map("collection" -> collection)
 			,Map("map" -> map, "reduce" -> reduce))
 
 		assertResult(Yield(Some(Map("items" -> "four,three,two,one", "counts" -> 4)))){
@@ -64,7 +64,7 @@ class JSEngineSpec extends FunSpec {
 			""".stripMargin)
 
 
-		val f = JsEngine.invokeAction("EXECUTE",List("input","executor"),Map()
+		val f = JsEngineSpecialized.invokeAction("EXECUTE",List("input","executor"),Map()
 			,Map("input" -> input, "executor" -> executor))
 
 		assertResult(Yield(Some("a"))){
