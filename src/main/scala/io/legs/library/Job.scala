@@ -1,11 +1,11 @@
-package io.legs.scheduling
+package io.legs.library
 
 import com.typesafe.scalalogging.Logger
-import io.legs.utils.{EnumJson, RedisProvider}
+import io.legs.utils.EnumJson
+import io.legs.utils.RedisProvider._
 import org.joda.time.{DateTime, DateTimeZone}
 import org.slf4j.LoggerFactory
 import play.api.libs.json.{JsValue, Json}
-import RedisProvider._
 
 import scala.concurrent.{ExecutionContext, Future}
 

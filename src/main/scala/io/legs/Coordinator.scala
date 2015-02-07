@@ -4,8 +4,7 @@ import akka.actor._
 import com.typesafe.scalalogging.Logger
 import io.legs.Coordinator.{GetStats, JobFailed, JobSuccess, Stop}
 import io.legs.Worker.StartWork
-import io.legs.scheduling.Job
-import io.legs.specialized.QueueSpecialized
+import io.legs.library.{Job, Queue}
 import org.slf4j.LoggerFactory
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -47,7 +46,7 @@ class Coordinator(labels: List[String], numMaxWorkers: Int) extends Actor {
 
 	private def lookForWork(){
 		statistics = statistics.touch
-		QueueSpecialized.getNextJobFromQueue(labels).map {
+		Queue.getNextJobFromQueue(labels).map {
 			case Some(job)=>
 				logger.info(s"found job id: ${job.id}")
 				logger.info(s"current workers count: ${workers.length}")

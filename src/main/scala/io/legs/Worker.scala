@@ -4,8 +4,7 @@ import akka.actor.{Actor, ActorRef, Props}
 import com.typesafe.scalalogging.Logger
 import io.legs.Coordinator.{JobFailed, JobSuccess}
 import io.legs.Specialization.{RoutableFuture, Yield}
-import io.legs.scheduling.{Job, JobType}
-import io.legs.specialized.QueueSpecialized
+import io.legs.library.{Job, JobType, Queue}
 import io.legs.utils.InstructionsFileResolver
 import org.slf4j.LoggerFactory
 
@@ -15,6 +14,8 @@ import scala.util.{Failure, Success, Try}
 
 
 class Worker(coordinator: ActorRef, job: Job) extends Actor {
+
+	implicit val ctx = context.dispatcher
 
 	import io.legs.Worker._
 
@@ -36,22 +37,29 @@ class Worker(coordinator: ActorRef, job: Job) extends Actor {
 
 	private def workerSuccess(){
 		logger.info(s"successfully finished jobId:${job.id}")
-		job.jobType match {
+		(job.jobType match {
 			case JobType.SCHEDULED_CHILD | JobType.AD_HOC  =>
 				logger.info(s"cleaning up ${job.jobType} jobId:${job.id} ")
-				QueueSpecialized.deleteJob(job)
-			case ignore =>
+				Queue.removeJob(job)
+					.flatMap ( _ => Job.delete(job.id) )
+			case ignore => Future.successful(Unit)
+		}) andThen {
+			case _ =>
+				coordinator ! JobSuccess(job.id)
+				stop()
 		}
-		coordinator ! JobSuccess(job.id)
-		stop()
 	}
 
 	private def workerFail(message:String, e:Option[Throwable] = None){
 		if (e.isDefined) logger.error(s"failing jobId:${job.id}  with message:$message",e.get)
 		else logger.warn("failing jobId:${job.id}  with message:$message")
-		QueueSpecialized.retryJob(job)
-		coordinator ! JobFailed(job.id, message)
-		stop()
+		Job.createOrUpdate(job.incRetry)
+			.andThen {
+				case _ =>
+					coordinator ! JobFailed(job.id, message)
+					stop()
+			}
+
 	}
 
 	private def stop(){

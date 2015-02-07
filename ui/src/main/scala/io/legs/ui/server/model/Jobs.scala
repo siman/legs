@@ -1,6 +1,6 @@
 package io.legs.ui.server.model
 
-import io.legs.scheduling.Job
+import io.legs.library.Job
 import io.legs.specialized.QueueSpecialized
 
 import scala.concurrent.{ExecutionContext, Future}
