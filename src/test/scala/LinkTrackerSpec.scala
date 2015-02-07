@@ -4,6 +4,8 @@ import org.scalatest.{BeforeAndAfter, FunSpec}
 
 class LinkTrackerSpec extends FunSpec with BeforeAndAfter {
 
+	import TestUtils._
+
 	val testDomain = "testing"
 	val test1Uri = "test1"
 
@@ -12,18 +14,18 @@ class LinkTrackerSpec extends FunSpec with BeforeAndAfter {
 	}
 
 	it("shows an entry did not exist"){
-		assertResult(false) { LinkTracker.checkExistCreate(testDomain, test1Uri) }
+		assertResult(false) { toBlocking(LinkTracker.checkExistCreate(testDomain, test1Uri)) }
 	}
 
 	it("shows an entry as existant when checking again"){
-		assertResult(false) { LinkTracker.checkExistCreate(testDomain, test1Uri) }
-		assertResult(true) { LinkTracker.checkExistCreate(testDomain, test1Uri) }
+		assertResult(false) { toBlocking(LinkTracker.checkExistCreate(testDomain, test1Uri)) }
+		assertResult(true) { toBlocking(LinkTracker.checkExistCreate(testDomain, test1Uri)) }
 	}
 
 	it("does not mix domains"){
-		assertResult(false) { LinkTracker.checkExistCreate(testDomain, test1Uri) }
-		assertResult(true) { LinkTracker.checkExistCreate(testDomain, test1Uri) }
-		assertResult(false) { LinkTracker.checkExistCreate(testDomain + "x", test1Uri) }
+		assertResult(false) { toBlocking(LinkTracker.checkExistCreate(testDomain, test1Uri)) }
+		assertResult(true) {  toBlocking(LinkTracker.checkExistCreate(testDomain, test1Uri)) }
+		assertResult(false) { toBlocking(LinkTracker.checkExistCreate(testDomain + "x", test1Uri)) }
 	}
 
 }

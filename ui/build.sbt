@@ -15,7 +15,7 @@ val akkaVersion = "2.3.8"
 val sprayVersion = "1.3.2"
 val playVersion = "2.4.0-M2"
 
-lazy val root = project.in(file("."))
+lazy val ui = project.in(file("."))
 	.dependsOn(shared,legs)
 	.settings(sharedSettings : _*)
 	.settings(

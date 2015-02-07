@@ -10,6 +10,7 @@ import io.legs.{Coordinator, CoordinatorStatistics}
 import org.scalatest.concurrent.{AsyncAssertions, Eventually}
 import org.scalatest.time.{Seconds, Span}
 import org.scalatest.{BeforeAndAfter, FunSpecLike}
+import scala.concurrent.ExecutionContext.Implicits.global
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
@@ -22,8 +23,8 @@ class CoordinatorSpec extends TestKit(ActorSystem("Step1PrimarySpec")) with FunS
 
 	it("starts and finds a job for its worker6"){
 
-		Queue.setupRedis()
-		Queue.queueAll()
+		Await.result( Queue.setupRedis(), Duration("10 seconds") )
+		Await.result( Queue.queueAll(),Duration("10 seconds") )
 
 		val coordActorRef = Coordinator.start(List("scheduler"),1)
 

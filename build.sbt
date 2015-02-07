@@ -10,7 +10,7 @@ sonatypeSettings
 
 organization := "io.legs"
 name := "legs"
-version := "0.8.7.0"
+version := "0.8.7.1"
 scalaVersion := "2.11.4"
 licenses := Seq("MIT-style" -> url("http://opensource.org/licenses/mit-license.php"))
 homepage := Some(url("https://github.com/uniformlyrandom/legs"))
@@ -63,16 +63,16 @@ libraryDependencies ++= Seq(
 	"com.etaty.rediscala" %% "rediscala" % "1.3.1",
 	"com.uniformlyrandom" %% "scron" % "0.5.2",
 	"com.github.detro.ghostdriver" % "phantomjsdriver" % "1.1.0",
-	"io.gatling" %% "jsonpath" % "0.6.2",
-	"org.apache.logging.log4j" % "log4j-api" % "2.0.2" % "test",
-	"org.apache.logging.log4j" % "log4j-core" % "2.0.2"  % "test",
-	"org.apache.logging.log4j" % "log4j-slf4j-impl" % "2.0.2"  % "test"
+	"io.gatling" %% "jsonpath" % "0.6.2"
 )
 	.map(_.exclude("org.slf4j", "slf4j-log4j12"))
 	.map(_.exclude("log4j", "log4j"))
 
 libraryDependencies ++= Seq (
-	"com.typesafe.scala-logging" %% "scala-logging" % "3.1.0"
+	"com.typesafe.scala-logging" %% "scala-logging" % "3.1.0",
+	"org.apache.logging.log4j" % "log4j-api" % "2.0.2" % "test",
+	"org.apache.logging.log4j" % "log4j-core" % "2.0.2"  % "test",
+	"org.apache.logging.log4j" % "log4j-slf4j-impl" % "2.0.2"  % "test"
 )
 
 resolvers ++= Seq(

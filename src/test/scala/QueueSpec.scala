@@ -1,14 +1,16 @@
-import io.legs.scheduling.{Priority, JobType, Job}
-import io.legs.{Step, Specialization}
+import io.legs.scheduling.{Job, JobType, Priority}
 import io.legs.specialized.Queue
 import io.legs.utils.RedisProvider
+import io.legs.{Specialization, Step}
 import org.scalatest.concurrent.AsyncAssertions
 import org.scalatest.{BeforeAndAfter, FunSpec}
 import play.api.libs.json.Json
-import scala.concurrent.Await
-import scala.concurrent.duration.Duration
+
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class QueueSpec extends FunSpec with AsyncAssertions with BeforeAndAfter {
+
+	import TestUtils._
 
 	before {
 		RedisProvider.drop("!!!")
@@ -21,25 +23,26 @@ class QueueSpec extends FunSpec with AsyncAssertions with BeforeAndAfter {
 	)
 
 
+
 	it("runs setup correctly"){
-		Await.result(Queue.setupRedis(), Duration(2, "seconds"))
-		Queue.getJob(Queue.getSchedulerJob.id) match {
+		toBlocking(Queue.setupRedis())
+		toBlocking(Job.get(Queue.getSchedulerJob.id)) match {
 			case Some(job)=> assertResult(Queue.getSchedulerJob.id) { job.id }
 			case None => fail("did not get the job")
 		}
 	}
 
 	it("gets the next job id"){
-		Await.result(Queue.setupRedis(), Duration(2, "seconds"))
-		assertResult( Queue.jobsStartValue.toInt + 1 ) { Queue.getNextJobId.toInt }
+		toBlocking(Queue.setupRedis())
+		assertResult(Queue.jobsStartValue.toInt + 1 ) { toBlocking(Job.getNextJobId).toInt }
 	}
 
 	it("persists a job to redis"){
 
-		Await.result(Queue.persistJob(Queue.getSchedulerJob),Duration(2, "seconds"))
+		toBlocking(Job.createOrUpdate(Queue.getSchedulerJob))
 
 		RedisProvider.blockingRedis[Option[String]] {
-			_.hget[String](Queue.jobsData_HS, Queue.getSchedulerJob.id)
+			_.hget[String](Job.jobsData_HS, Queue.getSchedulerJob.id)
 		} match {
 			case None => fail("did not get seeded queue job")
 			case Some(jobStr) =>
@@ -48,11 +51,11 @@ class QueueSpec extends FunSpec with AsyncAssertions with BeforeAndAfter {
 	}
 
 	it("creates a scheduled job"){
-		Queue.persistJob(Queue.getSchedulerJob)
-		Await.result(Specialization.executeStep(
+		Job.createOrUpdate(Queue.getSchedulerJob)
+		toBlocking(Specialization.executeStep(
 			Step("io.legs.specialized.Queue/PLAN/when/jobID",None,None),
 			Map("when" -> Queue.Plans.oncePerHour, "jobID" -> "100")
-		), Duration("5 seconds"))
+		))
 
 		RedisProvider.blockingRedis[Map[String,String]] {
 			_.hgetall[String](Queue.schedulePlansKey_HS)
@@ -65,12 +68,12 @@ class QueueSpec extends FunSpec with AsyncAssertions with BeforeAndAfter {
 
 	it("queues specific job") {
 
-		Await.result(Queue.setupRedis(), Duration(2, "seconds"))
+		toBlocking(Queue.setupRedis())
 
-		Await.result(Specialization.executeStep(
+		toBlocking(Specialization.executeStep(
 			Step("io.legs.specialized.Queue/QUEUE/jobID",None,None),
 			Map("jobID" -> "100")
-		), Duration("5 seconds"))
+		))
 
 		RedisProvider.blockingRedis {
 			_.zrange(Queue.queueByLabelKey_ZL(Queue.getSchedulerJob.labels.head),0, -1)
@@ -82,30 +85,31 @@ class QueueSpec extends FunSpec with AsyncAssertions with BeforeAndAfter {
 
 
 	it ("queues all scheduled jobs"){
-		Await.result(Queue.setupRedis(), Duration(2, "seconds"))
-		Queue.queueAll()
+		toBlocking(Queue.setupRedis())
+		toBlocking(Queue.queueAll())
 
 		RedisProvider.blockingRedis{
 			_.zrange(Queue.queueByLabelKey_ZL(Queue.getSchedulerJob.labels.head),0, -1)
 		}.length match {
 			case 2 => // good
-			case _ => fail("did not get good result")
+			case x => fail("did not get good result,=" + x)
 		}
 	}
 
 	it("takes the next job in the queue"){
-		Await.result(Queue.setupRedis(), Duration(2, "seconds"))
-		Queue.persistJob(testJob)
-		Queue.queueJobImmediately(testJob)
+		toBlocking(
+			Queue.setupRedis()
+				.flatMap(_ => Job.createOrUpdate(testJob))
+				.flatMap(_ => Queue.queueJobImmediately(testJob))
+		)
 
-		val jobOpt = Queue.getNextJobFromQueue(List(testJobLabel))
-		assertResult( true ) { jobOpt.isDefined }
+		assertResult( true ) { toBlocking(Queue.getNextJobFromQueue(List(testJobLabel))).isDefined }
 	}
 
 	it("upon taking a job it adds it to the appropriate working priority zlist and removes it from the label queue"){
-		Await.result(Queue.setupRedis(), Duration(2, "seconds"))
-		Queue.persistJob(testJob)
-		Queue.queueJobImmediately(testJob)
+		toBlocking(Queue.setupRedis())
+		toBlocking(Job.createOrUpdate(testJob))
+		toBlocking(Queue.queueJobImmediately(testJob))
 
 		RedisProvider.blockingRedis {
 			_.zrange(Queue.queueByLabelKey_ZL(testJobLabel),0, -1)
@@ -141,13 +145,13 @@ class QueueSpec extends FunSpec with AsyncAssertions with BeforeAndAfter {
 
 
 	it("deletes a job"){
-		Await.result(Queue.setupRedis(), Duration(2, "seconds"))
-		Queue.persistJob(testJob)
-		Queue.queueJobImmediately(testJob)
+		toBlocking(Queue.setupRedis())
+		toBlocking(Job.createOrUpdate(testJob))
+		toBlocking(Queue.queueJobImmediately(testJob))
 
-		val jobOpt = Queue.getNextJobFromQueue(List(testJobLabel))
+		val jobOpt = toBlocking(Queue.getNextJobFromQueue(List(testJobLabel)))
 
-		Queue.deleteJob(jobOpt.get)
+		toBlocking(Queue.deleteJob(jobOpt.get))
 
 		assertResult(None) {
 			RedisProvider.blockingRedis { _.zrank(Queue.queueByLabelKey_ZL(testJobLabel),jobOpt.get.id) }
@@ -159,12 +163,12 @@ class QueueSpec extends FunSpec with AsyncAssertions with BeforeAndAfter {
 			RedisProvider.blockingRedis { _.zrank(Queue.queueWorkingByLabelKey_ZL(testJobLabel),jobOpt.get.id) }
 		}
 		assertResult(None) {
-			Queue.getJob(jobOpt.get.id)
+			toBlocking(Job.get(jobOpt.get.id))
 		}
 
-		Queue.deleteJob(Queue.getSchedulerJob)
+		toBlocking(Queue.deleteJob(Queue.getSchedulerJob))
 
-		assertResult(None) { Queue.getJob(Queue.getSchedulerJob.id) }
+		assertResult(None) { toBlocking(Job.get(Queue.getSchedulerJob.id)) }
 		assertResult(None) {
 			RedisProvider.blockingRedis { _.hget(Queue.schedulePlansKey_HS,jobOpt.get.id) }
 		}

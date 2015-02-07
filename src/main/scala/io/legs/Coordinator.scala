@@ -47,7 +47,7 @@ class Coordinator(labels: List[String], numMaxWorkers: Int) extends Actor {
 
 	private def lookForWork(){
 		statistics = statistics.touch
-		Queue.getNextJobFromQueue(labels) match {
+		Queue.getNextJobFromQueue(labels).map {
 			case Some(job)=>
 				logger.info(s"found job id: ${job.id}")
 				logger.info(s"current workers count: ${workers.length}")
