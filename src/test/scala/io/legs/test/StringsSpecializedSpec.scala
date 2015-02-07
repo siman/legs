@@ -1,3 +1,5 @@
+package io.legs.test
+
 import io.legs.Specialization
 import io.legs.Specialization.Yield
 import io.legs.specialized.StringsSpecialized

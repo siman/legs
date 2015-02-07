@@ -133,9 +133,22 @@ object Queue {
 		queueJobIn( job, DateTime.now(DateTimeZone.UTC).getMillis )
 
 
-	private def getJobsSchedules()(implicit ec : ExecutionContext) =
+	def getJobsSchedules()(implicit ec : ExecutionContext) =
 		asyncRedis( _.hgetall[String](schedulePlansKey_HS) )
-	
+
+
+	def removeJob(job: Job) : Future[Unit] =
+		asyncRedis { rc =>
+			Future.sequence(job.labels.map(l=>{
+				rc.zrem(queueByLabelKey_ZL(l),job.id)
+				rc.zrem(queueWorkingByLabelKey_ZL(l),job.id)
+				rc.zrem(queueDeferredByLabelKey_ZL(l),job.id)
+			}) ::: List(
+				rc.hdel(schedulePlansKey_HS, job.id)
+			)).map {
+				_ => logger.info(s"finished deleting artifacts for job${job.id}")
+			}
+		}
 
 	private lazy val nextJobFromQueueLua = RedisScript(s"""
 		local queueByLabelPrefix = "$queueByLabelPrefix_ZL"
@@ -200,19 +213,6 @@ object Queue {
 		-- if we got this far, there are no jobs in the queue
 		return nil
 		"""	)
-
-	def removeJob(job: Job) : Future[Unit] =
-		asyncRedis { rc =>
-			Future.sequence(job.labels.map(l=>{
-				rc.zrem(queueByLabelKey_ZL(l),job.id)
-				rc.zrem(queueWorkingByLabelKey_ZL(l),job.id)
-				rc.zrem(queueDeferredByLabelKey_ZL(l),job.id)
-			}) ::: List(
-				rc.hdel(schedulePlansKey_HS, job.id)
-			)).map {
-				_ => logger.info(s"finished deleting artifacts for job${job.id}")
-			}
-		}
 
 
 }

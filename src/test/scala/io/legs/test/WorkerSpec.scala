@@ -1,9 +1,12 @@
-import helpers.TestSpecializer
-import java.util.UUID
-import org.scalatest.concurrent.{Eventually, AsyncAssertions}
-import org.scalatest.FunSpec
+package io.legs.test
 
+import java.util.UUID
+
+import helpers.TestSpecializer
 import io.legs.Worker
+import org.scalatest.FunSpec
+import org.scalatest.concurrent.{AsyncAssertions, Eventually}
+
 import scala.util.{Failure, Success}
 
 class WorkerSpec extends FunSpec with AsyncAssertions with Eventually {

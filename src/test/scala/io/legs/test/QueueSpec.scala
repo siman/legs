@@ -1,4 +1,6 @@
-import io.legs.library.{Queue, Priority, JobType, Job}
+package io.legs.test
+
+import io.legs.library.{Job, JobType, Priority, Queue}
 import io.legs.utils.RedisProvider
 import io.legs.{Specialization, Step}
 import org.scalatest.concurrent.AsyncAssertions
@@ -9,7 +11,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 class QueueSpec extends FunSpec with AsyncAssertions with BeforeAndAfter {
 
-	import TestUtils._
+	import io.legs.test.TestUtils._
 
 	before {
 		RedisProvider.drop("!!!")

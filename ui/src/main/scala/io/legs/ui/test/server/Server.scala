@@ -1,4 +1,4 @@
-package io.legs.ui.server
+package io.legs.ui.test.server
 
 import akka.actor.ActorSystem
 import spray.http.{HttpEntity, MediaTypes}

@@ -27,7 +27,7 @@ trait Specialization {
 		routes.find( r=> r._1 == name && (r._2.length - (if (r._2.last == classOf[ExecutionContext]) 1 else 0 )) == numArgs +1 )
 
 	def invokeAction(name: String, paramNames: List[String], state: Specialization.State, actionValues:Map[String,JsValue])(implicit ctx : ExecutionContext) : RoutableFuture = {
-		spcializationLogger.info(s"attempting to invoke action name:$name")
+		spcializationLogger.info(s"invoking action:`$name`")
 		getRoute(name, paramNames.length) match {
 			case Some(route) =>
 				val paramResolver = actionValues ++ state

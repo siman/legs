@@ -1,3 +1,5 @@
+package io.legs.test
+
 import java.util.concurrent.TimeUnit
 
 import akka.actor.ActorSystem

@@ -1,10 +1,12 @@
+package io.legs.test
+
 import io.legs.Specialization.Yield
 import io.legs.specialized.JsonSpecialized
 import org.scalatest.FunSpec
 
 import scala.concurrent.Await
-import scala.concurrent.duration.Duration
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration.Duration
 
 class JSONPathSpec extends FunSpec {
 

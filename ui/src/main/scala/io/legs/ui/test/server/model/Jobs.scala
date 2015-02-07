@@ -1,14 +1,13 @@
-package io.legs.ui.server.model
+package io.legs.ui.test.server.model
 
-import io.legs.library.Job
-import io.legs.specialized.QueueSpecialized
+import io.legs.library.{Job, Queue}
 
 import scala.concurrent.{ExecutionContext, Future}
 
 object Jobs {
 
 	def getScheduledJobs()(implicit ec : ExecutionContext) : Future[List[ScheduledJob]] =
-		QueueSpecialized.getJobsSchedules.flatMap {
+		Queue.getJobsSchedules.flatMap {
 			case schedules =>
 				Future.sequence( schedules.keys.map(jId=>Job.get(jId)) )
 					.map { jobsOpts =>

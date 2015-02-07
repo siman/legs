@@ -1,12 +1,13 @@
+package io.legs.test
+
 import io.legs.Specialization.Yield
 import io.legs.specialized.JsEngineSpecialized
 import org.scalatest.FunSpec
 import play.api.libs.json.JsString
 
 import scala.concurrent.Await
-import scala.concurrent.duration.Duration
-import scala.util.Success
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration.Duration
 /**
  * Created: 6/3/14 8:22 PM
  */

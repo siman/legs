@@ -1,4 +1,4 @@
-package io.legs.ui.server
+package io.legs.ui.test.server
 
 import scalatags.Text.all._
 

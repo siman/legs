@@ -1,3 +1,5 @@
+package io.legs.test
+
 import io.legs.utils.InstructionsFileResolver
 import org.scalatest.FunSpec
 

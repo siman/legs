@@ -1,3 +1,5 @@
+package io.legs.test
+
 
 import helpers.TestSpecializer
 import io.legs.specialized.ToolsSpecialized

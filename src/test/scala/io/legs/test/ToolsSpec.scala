@@ -1,13 +1,17 @@
+package io.legs.test
+
+import java.util.UUID
+
 import helpers.TestSpecializer
 import io.legs.Specialization.Yield
-import io.legs.{Step, Specialization}
 import io.legs.specialized.ToolsSpecialized
-import java.util.UUID
+import io.legs.{Specialization, Step}
 import org.scalatest.FunSpec
-import play.api.libs.json.{JsNumber, JsString, JsArray, Json}
+import play.api.libs.json.{JsArray, JsNumber, JsString, Json}
+
 import scala.concurrent.Await
-import scala.concurrent.duration.Duration
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration.Duration
 
 /**
  * Created: 6/7/14 11:47 AM

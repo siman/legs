@@ -1,10 +1,12 @@
+package io.legs.test
+
 import io.legs.specialized.LinkTrackerSpecialized
 import io.legs.utils.RedisProvider
 import org.scalatest.{BeforeAndAfter, FunSpec}
 
 class LinkTrackerSpec extends FunSpec with BeforeAndAfter {
 
-	import TestUtils._
+	import io.legs.test.TestUtils._
 
 	val testDomain = "testing"
 	val test1Uri = "test1"

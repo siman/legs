@@ -1,3 +1,5 @@
+package io.legs.test
+
 import org.scalatest.FunSpec
 
 class ActionTokenizerSpec extends FunSpec {

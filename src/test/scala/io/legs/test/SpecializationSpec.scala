@@ -1,13 +1,15 @@
+package io.legs.test
+
 import java.util.UUID
 
 import helpers.{CustomSpecialized, TestSpecializer}
 import io.legs.Specialization._
-import io.legs.{Worker, Specialization, Step}
+import io.legs.{Specialization, Step, Worker}
 import org.scalatest.FunSpec
 import org.scalatest.concurrent.AsyncAssertions
 import play.api.libs.json.{JsNumber, JsString}
 
-import scala.concurrent.{Future, Await}
+import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 import scala.util.Success
 

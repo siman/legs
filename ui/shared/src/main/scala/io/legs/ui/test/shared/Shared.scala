@@ -1,4 +1,4 @@
-package io.legs.ui.shared
+package io.legs.ui.test.shared
 
 case class Shared(
 	param : String,

@@ -1,7 +1,8 @@
-package io.legs.ui.client
+package io.legs.ui.test.client
+
+import io.legs.ui.test.shared.Shared
 
 import scala.scalajs.js.JSApp
-import io.legs.ui.shared.Shared
 
 object Tut extends JSApp {
 	def main(): Unit = {
