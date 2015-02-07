@@ -23,7 +23,9 @@ object RedisProvider {
 
 	private lazy val redisPool = {
 		logger.info(s"initializing pool $host:$port/$db")
-		RedisClientPool((0 until poolSize).map(_=>RedisServer(host,port,None,Some(db))),Config.Env.toString())
+		RedisClientPool(
+			(0 until poolSize)
+				.map( _ => RedisServer(host,port,None,Some(db))),Config.Env.toString() )
 	}
 
 	def asyncRedis[T](body: RedisCommands => Future[T]) : Future[T] = body(redisPool)

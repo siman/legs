@@ -18,7 +18,7 @@ class Worker(coordinator: ActorRef, job: Job) extends Actor {
 
 	import io.legs.Worker._
 
-	def receive  = {
+	def receive = {
 		case StartWork => startWork()
 	}
 

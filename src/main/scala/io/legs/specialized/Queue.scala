@@ -65,21 +65,21 @@ object Queue extends Specialization {
 	def setupRedis()(implicit ec : ExecutionContext) : Future[Unit] = {
 		logger.info("setting up redis")
 		writeJobPlan(getSchedulerJob.id, "0 0 * * * *")
-			.flatMap( _=> asyncRedis(_.eval(setupRedisLua)) )
-			.map(_=> Unit)
+			.flatMap( _ => asyncRedis(_.eval(setupRedisLua)) )
+			.map( _ => Unit)
 
 	}
 
 	def queueJobImmediately(job: Job) : Future[Unit] =
-		persistJobQueue(job, DateTime.now(DateTimeZone.UTC).getMillis)
+		persistJobQueue( job, DateTime.now(DateTimeZone.UTC).getMillis )
 
 
 	private def getScheduleForJob(id : String) : Future[Option[String]] =
-		asyncRedis { _.hget[String](schedulePlansKey_HS, id) }
+		asyncRedis( _.hget[String](schedulePlansKey_HS, id) )
 
 
 	private def getAllScheduledJobs()(implicit ec : ExecutionContext) =
-		asyncRedis { _.hgetall[String](schedulePlansKey_HS) }
+		asyncRedis( _.hgetall[String](schedulePlansKey_HS) )
 
 	private def persistJobQueue(job: Job, timeMillis: Long)(implicit ec : ExecutionContext) : Future[Unit] = {
 		logger.info(s"persisting job in queue jobId ${job.id} time $timeMillis")
@@ -157,9 +157,9 @@ object Queue extends Specialization {
 
 	def getNextJobFromQueue(labels: List[String]) : Future[Option[Job]] = {
 		logger.info(s"getting next job from queue for labels:${labels.mkString(",")}")
-		asyncRedis {
+		asyncRedis (
 			_.evalshaOrEval(nextJobFromQueueLua,Nil,Seq(Json.toJson(labels).toString(),DateTime.now(DateTimeZone.UTC).getMillis.toString))
-		} map {
+		) map {
 			case b: Bulk => b.toOptString.map(s=>Json.parse(s.toString).as[Job])
 			case _ => None
 		}
@@ -298,9 +298,8 @@ object Queue extends Specialization {
 		yieldDetails = ""
 	)
 	def QUEUE_ALL(state: Specialization.State)(implicit ctx : ExecutionContext) : RoutableFuture =
-		Future {
-			queueAll()
-			Yield(None)
-		}
+		queueAll()
+			.map( _ => Yield(None) )
+
 
 }

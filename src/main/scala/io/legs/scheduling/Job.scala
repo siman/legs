@@ -67,23 +67,20 @@ object Job {
 	implicit val fmt = Json.format[Job]
 
 	def createOrUpdate(job:Job) : Future[Boolean] =
-		asyncRedis(_.hset(Job.jobsData_HS,job.id,Json.stringify(Json.toJson(job))))
+		asyncRedis( _.hset(Job.jobsData_HS,job.id,Json.stringify(Json.toJson(job))) )
 
 	def get(id: String)(implicit ec : ExecutionContext) : Future[Option[Job]] =
-		RedisProvider.asyncRedis {
-			_.hget[String](Job.jobsData_HS,id)
-		}.map {
-			_.map(jobStr => Json.parse(jobStr).as[Job] )
-		}
+		asyncRedis( _.hget[String](Job.jobsData_HS,id) )
+			.map( _.map(jobStr => Json.parse(jobStr).as[Job]) )
 
 	def delete(id : String)(implicit ec : ExecutionContext) : Future[Int] = {
 		logger.info(s"deleting job $id from")
-		RedisProvider.asyncRedis(_.del(jobsData_HS, id))
+		asyncRedis(_.del(jobsData_HS, id))
 			.map(_.toInt)
 	}
 
 	def getNextJobId()(implicit ec : ExecutionContext) : Future[String] =
-		RedisProvider.asyncRedis(_.incr(jobsCounterKey_S))
+		asyncRedis(_.incr(jobsCounterKey_S))
 			.map(_.toString)
 
 }

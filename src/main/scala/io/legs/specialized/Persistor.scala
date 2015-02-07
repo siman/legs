@@ -23,7 +23,6 @@ object Persistor extends Specialization {
 		filePath: String @LegsParamAnnotation("the full file path to be used for persisting the contents")
 	)(implicit ctx : ExecutionContext) : RoutableFuture =
 		Future {
-
 			var appending = List.empty[String]
 			keys.foreach(k=> state.get(k.value) match {
 				case Some(v : List[Any]) => v.foreach( _v=> appending ::= _v.toString + "\n"  )
