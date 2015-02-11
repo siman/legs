@@ -24,14 +24,12 @@ class ServerSpec extends FunSpec with BeforeAndAfter {
 				Await.result(Jobs.getScheduledJobs(),duration)
 			}
 
-			val results = toBlocking(Future.sequence(List(
-				Job.createOrUpdate(Queue.getSchedulerJob),
-				Queue.writeJobSchedule(Queue.getSchedulerJob.id,Queue.Plans.oncePerHour),
-				Jobs.getScheduledJobs()
-			)))
+			toBlocking(Job.createOrUpdate(Queue.getSchedulerJob))
+			toBlocking(Queue.writeJobSchedule(Queue.getSchedulerJob.id,Queue.Plans.oncePerHour))
+			val result = toBlocking(Jobs.getScheduledJobs())
 
 			assertResult(1){
-				results.last.asInstanceOf[List[ScheduledJob]].length
+				result.length
 			}
 
 		}
