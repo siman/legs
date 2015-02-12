@@ -1,3 +1,5 @@
+Revolver.settings
+
 val _appVersion = "0.0.1-SNAPSHOT"
 val _scalaVersion = "2.11.15"
 val _akkaVersion = "2.3.8"
@@ -24,16 +26,17 @@ val app = crossProject
 		),
 		jsDependencies ++= Seq(
 			"org.webjars" % "react" % "0.12.1" / "react-with-addons.js" commonJSName "React",
-			RuntimeDOM % "test"
-		)
-	).jvmSettings(
+			RuntimeDOM
+		),
+		skip in packageJSDependencies := false
+	).jvmSettings(Revolver.settings : _*)
+	.jvmSettings(
 		name := "legs.io-ui-server",
 		version := "0.0.1",
 		organization := "io.legs.ui",
 		fork in Test := true,
 		publishArtifact in Test := false,
 		javaOptions in Test := Seq("-DisTest=yes"),
-		//jsStyleDependsOnS(legs, Compile -> Compile, Test -> Test),
 		libraryDependencies ++= Seq(
 			"com.typesafe.akka" %% "akka-actor" % "2.3.6",
 			"org.scalatest" %% "scalatest" % "2.2.1" % "test",
@@ -54,21 +57,32 @@ val app = crossProject
 				)
 	)
 
-lazy val appJS = app.js
-lazy val appJVM = app.jvm.settings(
-	(resources in Compile) += (fastOptJS in (appJS, Compile)).value.data
-)
+// configure a specific directory for scalajs output
+val scalajsOutputDir = Def.settingKey[File]("directory for javascript files output by scalajs")
 
-def jsStyleDependsOn(deps: Project*) =
-	deps.foldLeft(identity[Project]_)(_ compose jsStyleDependsOnS(_)(Compile -> Compile, Test -> Test))
 
-def jsStyleDependsOnS(deps: Project*)(scopes: (Configuration, Configuration)*) =
-	(_: Project).settings((
-		for {
-			dep    <- deps
-			(a, b) <- scopes
-		} yield
-			unmanagedSourceDirectories in b += (scalaSource in a in dep).value
-		): _*)
+// make all JS builds use the output dir defined later
+lazy val js2jvmSettings = Seq(packageScalaJSLauncher, fastOptJS, fullOptJS) map { packageJSKey =>
+	crossTarget in(appJS, Compile, packageJSKey) := scalajsOutputDir.value
+}
 
 lazy val legs = ProjectRef(file("../"),"legs")
+
+lazy val appJS = app.js.settings(
+	fastOptJS in Compile := {
+		// make a copy of the produced JS-file (and source maps) under the appJS project as well,
+		// because the original goes under the spaJVM project
+		// NOTE: this is only done for fastOptJS, not for fullOptJS
+		val base = (fastOptJS in Compile).value
+		IO.copyFile(base.data, (classDirectory in Compile).value / "app" / "js" / base.data.getName)
+		IO.copyFile(base.data, (classDirectory in Compile).value / "app" / "js" / (base.data.getName + ".map"))
+		base
+	}
+)
+
+lazy val appJVM = app.jvm.settings(js2jvmSettings: _*).settings(
+	// scala.js output is directed under "app/js" dir in the appJVM project
+	scalajsOutputDir := (classDirectory in Compile).value / "app" / "js",
+	// compile depends on running fastOptJS on the JS project
+	compile in Compile <<= (compile in Compile) dependsOn (fastOptJS in(appJS, Compile))
+)

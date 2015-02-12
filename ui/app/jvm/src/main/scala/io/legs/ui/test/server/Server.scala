@@ -7,6 +7,7 @@ import spray.routing.SimpleRoutingApp
 import scala.util.Properties
 
 object Server extends SimpleRoutingApp {
+
 	def main(args : Array[String]) : Unit = {
 		implicit val system = ActorSystem()
 		val port = Properties.envOrElse("PORT","8080").toInt
@@ -20,7 +21,7 @@ object Server extends SimpleRoutingApp {
 						)
 					}
 				} ~
-				getFromResourceDirectory("")
+				getFromResourceDirectory("app")
 			} ~
 			post {
 				path("ajax" / "list") {
