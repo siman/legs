@@ -1,5 +1,3 @@
-Revolver.settings
-
 val _appVersion = "0.0.1-SNAPSHOT"
 val _scalaVersion = "2.11.15"
 val _akkaVersion = "2.3.8"
@@ -10,22 +8,24 @@ val app = crossProject
 	.jvmConfigure(_.dependsOn(legs % "compile->compile;test->test"))
 	.jsConfigure(_.dependsOn(legs % "compile->compile;test->test"))
 	.settings(
-		unmanagedSourceDirectories in Compile +=
-			baseDirectory.value  / "shared" / "main" / "scala",
+		unmanagedSourceDirectories in Compile += baseDirectory.value  / "shared" / "main" / "scala",
+		unmanagedResourceDirectories in Compile += baseDirectory.value / "shared" / "src" / "main" / "resources",
+		unmanagedResourceDirectories in Test += baseDirectory.value / "shared" / "src" / "test" / "resources",
 		libraryDependencies ++= Seq(
 			"com.lihaoyi" %%% "scalatags" % "0.4.5",
+			"com.lihaoyi" %%% "autowire" % "0.2.4",
 			"com.lihaoyi" %%% "upickle" % "0.2.6"
 		),
 		scalaVersion := "2.11.5"
 	).jsSettings(
 		libraryDependencies ++= Seq(
+			"org.scala-js" %%% "scalajs-dom" % "0.8.0",
 			"com.github.japgolly.scalajs-react" %%% "core" % "0.8.0",
+			"com.github.japgolly.scalajs-react" %%% "extra" % "0.8.0",
 			"be.doeraene" %%% "scalajs-jquery" % "0.8.0",
-			"com.lihaoyi" %%% "autowire" % "0.2.4",
 			"com.lihaoyi" %%% "scalarx" % "0.2.7"
 		),
 		jsDependencies ++= Seq(
-			"org.webjars" % "react" % "0.12.1" / "react-with-addons.js" commonJSName "React",
 			RuntimeDOM
 		),
 		skip in packageJSDependencies := false

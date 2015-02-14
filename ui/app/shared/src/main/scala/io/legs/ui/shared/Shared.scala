@@ -1,6 +1,7 @@
-package io.legs.ui.test.shared
+package io.legs.ui.shared
 
 case class Shared(
 	param : String,
 	intParam : Int
 )
+
