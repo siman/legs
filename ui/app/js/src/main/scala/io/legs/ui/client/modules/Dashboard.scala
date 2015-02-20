@@ -9,13 +9,12 @@ object Dashboard {
 	val component = ReactComponentB[MainRouter.Router]("Dashboard")
 		.render(router => {
 		// get internal links
-		val appLinks = MainRouter.appLinks(router)
 		<.div(
 			// header, MessageOfTheDay and chart components
 			<.h2("Dashboard"),
 			Motd(),
 			// create a link to the Todo view
-			<.div(appLinks.todo("Check your todos!"))
+			<.div(router.link(MainRouter.todoLoc)("Check your todos!"))
 		)
 	}).build
 }

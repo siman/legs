@@ -5,7 +5,7 @@ import scalatags.Text.tags2.{style => style2}
 
 object Page{
 
-	val boot = 	"io.legs.ui.client.Tut().main()"
+	val boot = 	"io.legs.ui.client.Client().main()"
 
 	val skeleton =
 		"<!DOCTYPE html>" + html(
