@@ -1,14 +1,14 @@
 package io.legs.ui.test
 
 import io.legs.library.{Job, Queue}
-import io.legs.ui.test.server.model.{ScheduledJob, Jobs}
+import io.legs.ui.server.service.Jobs
 import io.legs.utils.RedisProvider
 import org.scalatest.{BeforeAndAfter, FunSpec}
 
+import scala.concurrent.Await
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.{Await, Future}
 
-class ServerSpec extends FunSpec with BeforeAndAfter {
+class ServicesSpec extends FunSpec with BeforeAndAfter {
 
 	import io.legs.test.TestUtils._
 

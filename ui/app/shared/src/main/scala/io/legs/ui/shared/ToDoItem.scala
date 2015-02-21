@@ -1,4 +1,5 @@
 package io.legs.ui.shared
+import upickle._
 
 sealed trait TodoPriority
 case object TodoLow extends TodoPriority

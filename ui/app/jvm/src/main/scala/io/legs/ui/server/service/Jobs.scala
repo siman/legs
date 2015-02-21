@@ -1,6 +1,7 @@
-package io.legs.ui.test.server.model
+package io.legs.ui.server.service
 
 import io.legs.library.{Job, Queue}
+import io.legs.ui.shared.model.ScheduledJob
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -20,9 +21,5 @@ object Jobs {
 
 }
 
-case class ScheduledJob(
-	jobId :String,
-	schedule :String,
-	jobData : Option[Job]
-)
+
 

@@ -1,12 +1,19 @@
-package io.legs.ui.test.server
+package io.legs.ui.server
 
 import java.util.Date
 
+import io.legs.ui.server.service.Jobs
 import io.legs.ui.shared._
+import io.legs.ui.shared.model.ScheduledJob
 
-class ApiService extends Api {
+import scala.concurrent.{Future, ExecutionContext}
+import scala.concurrent.ExecutionContext.Implicits.global
+
+object ApiService extends Api {
+
 	override def motd(name: String): String = s"Welcome to SPA, $name! Time is now ${new Date}"
-	override def getTodos(): Seq[TodoItem] = {
+
+	def getTodos(): Seq[TodoItem] = {
 		// provide some fake Todos
 		Seq(
 			TodoItem("1", "Wear shirt that says “Life”. Hand out lemons on street corner.", TodoLow, completed = false),
@@ -16,9 +23,13 @@ class ApiService extends Api {
 		)
 	}
 	// update a Todo
-	override def updateTodo(item: TodoItem): Unit = {
+
+	def updateTodo(item: TodoItem): Unit = {
 		// TODO, update database etc :)
 		println(s"Todo item was updated: $item")
 	}
+
+	def getScheduledJobs() : Future[Seq[ScheduledJob]] = Jobs.getScheduledJobs()
+
 }
 

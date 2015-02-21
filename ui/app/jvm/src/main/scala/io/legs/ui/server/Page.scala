@@ -1,4 +1,4 @@
-package io.legs.ui.test.server
+package io.legs.ui.server
 
 import scalatags.Text.all._
 import scalatags.Text.tags2.{style => style2}
