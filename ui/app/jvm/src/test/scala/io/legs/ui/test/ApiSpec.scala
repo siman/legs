@@ -48,7 +48,7 @@ class ApiSpec extends TestKit(ActorSystem("testsystem", ConfigFactory.parseStrin
 
 	}
 
-	it("uses the shugared macro impl"){
+	it("uses the sugared macro impl"){
 
 		implicit val backend = new NozzleBackend {
 			override def processMessage(resource: String, method: String, model: Option[String], uid: Option[String], query: Map[String, String]): Future[Option[String]] =
