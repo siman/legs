@@ -22,11 +22,11 @@ case class Job(
 	parentId:			Option[String] = None,
 	retries:			Int = 0,
 	lastRunTime: 		Option[Long] = None,
-	creationTime: 		Long = DateTime.now(DateTimeZone.UTC).getMillis,
+	creationTime: 		Long = System.currentTimeMillis,
 	uuid: 				String = java.util.UUID.randomUUID.toString
 ) {
 
-	def touch = copy( lastRunTime = Some(DateTime.now(DateTimeZone.UTC).getMillis) )
+	def touch = copy( lastRunTime = Some(System.currentTimeMillis) )
 
 	def forChildWithId(childId : String) = copy( jobType = JobType.SCHEDULED_CHILD, id = childId, parentId = Some(id) )
 
@@ -39,21 +39,21 @@ object JobStatus extends Enumeration {
 	type JobStatus = Value
 	val QUEUED, WORKING, DONE, DEFERRED = Value
 
-	implicit val fmt = EnumJson.enumFormat(JobStatus)
+	implicit lazy val fmt = EnumJson.enumFormat(JobStatus)
 }
 
 object JobType extends Enumeration {
 	type JobType = Value
 	val SCHEDULE_JOB, SCHEDULED_CHILD, AD_HOC = Value
 
-	implicit val fmt = EnumJson.enumFormat(JobType)
+	implicit lazy val fmt = EnumJson.enumFormat(JobType)
 }
 
 object Priority extends Enumeration {
 	type Priority = Value
 	val LOW, HIGH = Value
 
-	implicit val fmt = EnumJson.enumFormat(Priority)
+	implicit lazy val fmt = EnumJson.enumFormat(Priority)
 }
 
 object Job {
@@ -64,7 +64,7 @@ object Job {
 	final val jobsCounterKey_S = "legs:jobs:counter"
 
 
-	implicit val fmt = Json.format[Job]
+	implicit lazy val fmt = Json.format[Job]
 
 	def createOrUpdate(job:Job) : Future[Boolean] =
 		asyncRedis( _.hset(Job.jobsData_HS,job.id,Json.stringify(Json.toJson(job))) )

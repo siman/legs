@@ -11,7 +11,7 @@ sonatypeSettings
 organization := "io.legs"
 name := "legs"
 version := "0.8.7.1"
-scalaVersion := "2.11.4"
+scalaVersion := "2.11.5"
 licenses := Seq("MIT-style" -> url("http://opensource.org/licenses/mit-license.php"))
 homepage := Some(url("https://github.com/uniformlyrandom/legs"))
 
@@ -51,7 +51,7 @@ libraryDependencies ++= Seq(
 	"com.typesafe.akka" %% "akka-testkit" % akkaVersion % "test",
 	"com.typesafe.akka" %% "akka-actor" % akkaVersion,
 	"com.typesafe.akka" %% "akka-slf4j" % akkaVersion,
-	"org.scala-lang" % "scala-reflect" % "2.11.4",
+	"org.scala-lang" % "scala-reflect" % "2.11.5",
 	"org.jsoup" % "jsoup" % "1.7.2",
 	"com.typesafe.play" %% "play-json" % playVersion,
 	"net.sf.saxon" % "Saxon-HE" % "9.5.1-1",

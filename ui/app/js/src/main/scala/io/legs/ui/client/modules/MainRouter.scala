@@ -1,7 +1,6 @@
 package io.legs.ui.client.modules
 
 import japgolly.scalajs.react.extra.router._
-import japgolly.scalajs.react.vdom.prefix_<^._
 
 object MainRouter extends RoutingRules {
 	// register the components and store locations

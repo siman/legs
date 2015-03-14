@@ -12,7 +12,6 @@ object Dashboard {
 		<.div(
 			// header, MessageOfTheDay and chart components
 			<.h2("Dashboard"),
-			Motd(),
 			// create a link to the Todo view
 			<.div(router.link(MainRouter.todoLoc)("Check your todos!"))
 		)
