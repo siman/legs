@@ -8,6 +8,7 @@ import japgolly.scalajs.react.vdom.prefix_<^._
 import japgolly.scalajs.react.{BackendScope, ReactComponentB}
 import thirdparty.Bootstrap._
 import thirdparty.Icon
+import NozzleService._
 
 object DashboardComponent {
 
@@ -16,39 +17,41 @@ object DashboardComponent {
 	import NozzleService._
 	import io.legs.ui.shared.util.PicklingImplicits._
 
+	case class DashboardState(numQueued : Int)
+
 	val component = ReactComponentB[MainRouter.Router]("Dashboard")
 		.render(router => {
-			// get internal links
 			<.div(
-				// header, MessageOfTheDay and chart components
-				<.h2("Dashboard"),
+				<.h2("_"),
 				<.div(jobs()),
-				// create a link to the Todo view
 				<.div(router.link(MainRouter.todoLoc)("Check the job queue!"))
 			)
 		}).build
 
 
 
-	private class Backend(t: BackendScope[Unit, String]) {
+	private class Backend(t: BackendScope[Unit, DashboardState]) {
 
 		def refresh() {
-			//load a new message from the server
-			read[ScheduledJob](None,Map.empty[String,String]).map {
-				case Nil => t.modState(_ => "loading...1")
-				case res :: xs => t.modState(_ => res.jobId)
+
+			read[ScheduledJob](None,Map()).map {
+				case xs => t.modState(_ => DashboardState(numQueued = xs.length))
 			}
+
 		}
 
 	}
 
 	private lazy val jobs =
 		ReactComponentB[Unit]("Jobs")
-			.initialState("loading...") // show a loading text while message is being fetched from the server
+			.initialState(DashboardState(numQueued = -1))
 			.backend(new Backend(_))
 			.render((_, S, B) => {
-				Panel(PanelProps("Refresh"), <.div(S),
-					Button(ButtonProps(B.refresh, CommonStyle.danger), Icon.refresh, <.span("Update"))
+				Panel(PanelProps("Status"),
+					<.div(s"Scheduled #${S.numQueued}"),
+					Button(ButtonProps(B.refresh, CommonStyle.danger), Icon.refresh,
+						<.span("Update")
+					)
 				)
 			})
 			.componentDidMount(scope => {

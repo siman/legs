@@ -9,7 +9,7 @@ import thirdparty.Icon._
 
 object NavigationComponent {
 
-	protected case class MenuItem(label: String, icon: Icon, location: MainRouter.Loc, isActive : Boolean = false)
+	case class MenuItem(label: String, icon: Icon, location: MainRouter.Loc, isActive : Boolean = false)
 
 	protected val MainMenuItem = ReactComponentB[(MenuItem,MainRouter.Router)]("MainMenuItem")
 		.render { P=>
