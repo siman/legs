@@ -19,12 +19,7 @@ object QueueComponent {
 
 	protected class Backend(t: BackendScope[MainRouter.Router, QueueState]) {
 		def updateQueue(item: ScheduledJob): Unit = {
-			println("update..")
 			t.modState(s => QueueState(s.items.map(i => if (i.jobId == item.jobId) item else i)))
-			// update the state with the new TodoItem
-			// inform the server about this update
-			println("updating",item)
-			//      AjaxClient[Api].updateTodo(item).call()
 		}
 
 		def refresh(): Unit = {
@@ -53,20 +48,35 @@ object QueueComponent {
 			case Priority.HIGH => "list-group-item-danger"
 			case _ => ""
 		}
-		<.li(^.className := s"list-group-item $priority")(
-			<.input(^.tpe := "checkbox", ^.checked := item.jobData.status == JobStatus.DONE, ^.disabled := "disabled"),
-			<.span(item.jobId),
-			<.span(item.jobData.status.toString),
-			<.span(item.schedule),
-			<.span(item.jobData.instructions),
-			<.span(item.jobData.description)
+		<.tr(
+			<.th(^.scope := "row",item.jobId),
+			<.td(<.input(^.tpe := "checkbox", ^.checked := item.jobData.status == JobStatus.DONE, ^.disabled := "disabled")),
+			<.td(item.jobData.status.toString),
+			<.td(item.schedule),
+			<.td(item.jobData.instructions),
+			<.td(item.jobData.description)
 		)
+
 	}
 
 	private def queueItems =
 		ReactComponentB[(Seq[ScheduledJob], (ScheduledJob) => Unit)]("QueueItems")
 			.render(P => {
-				<.ul(^.className := "list-group")(P._1 map renderItem)
+				<.table(^.className := "table")(
+					<.thead(
+						<.tr(
+							<.th("Job ID"),
+							<.th("Done?"),
+							<.th("Status"),
+							<.th("Schedule"),
+							<.th("Instructions"),
+							<.th("Description")
+						)
+					),
+					<.tbody(
+						P._1 map renderItem
+					)
+				)
 			})
 			.build
 
