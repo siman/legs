@@ -1,6 +1,6 @@
 val _appVersion = "0.0.1-SNAPSHOT"
 val _scalaVersion = "2.11.5"
-val _akkaVersion = "2.3.8"
+val _akkaVersion = "2.3.9"
 val _sprayVersion = "1.3.2"
 val _playVersion = "2.4.0-M2"
 
@@ -24,8 +24,8 @@ val app = crossProject
 		unmanagedSourceDirectories in Compile <++= unmanagedSourceDirectories in (legs,Compile),
 		libraryDependencies ++= Seq(
 			"org.scala-js" %%% "scalajs-dom" % "0.8.0",
-			"com.github.japgolly.scalajs-react" %%% "core" % "0.8.0",
-			"com.github.japgolly.scalajs-react" %%% "extra" % "0.8.0",
+			"com.github.japgolly.scalajs-react" %%% "core" % "0.8.2",
+			"com.github.japgolly.scalajs-react" %%% "extra" % "0.8.2",
 			"be.doeraene" %%% "scalajs-jquery" % "0.8.0",
 		//	"com.lihaoyi" %%% "utest" % "0.3.0" % "test",
 			"org.monifu" %%% "minitest" % "0.11" % "test",

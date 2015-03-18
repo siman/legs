@@ -41,7 +41,7 @@ fullRunTask(gendocs, Compile, "io.legs.documentation.GenerateDocumentation")
 
 resolvers += "Sonatype OSS releases" at "https://oss.sonatype.org/service/local/staging/deploy/maven2"
 
-val akkaVersion = "2.3.8"
+val akkaVersion = "2.3.9"
 val playVersion = "2.4.0-M2"
 val tikaVersion = "1.4"
 
@@ -51,7 +51,7 @@ libraryDependencies ++= Seq(
 	"com.typesafe.akka" %% "akka-testkit" % akkaVersion % "test",
 	"com.typesafe.akka" %% "akka-actor" % akkaVersion,
 	"com.typesafe.akka" %% "akka-slf4j" % akkaVersion,
-	"org.scala-lang" % "scala-reflect" % "2.11.5",
+	"org.scala-lang" % "scala-reflect" % scalaVersion.value,
 	"org.jsoup" % "jsoup" % "1.7.2",
 	"com.typesafe.play" %% "play-json" % playVersion,
 	"net.sf.saxon" % "Saxon-HE" % "9.5.1-1",

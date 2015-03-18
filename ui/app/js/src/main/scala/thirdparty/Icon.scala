@@ -1,4 +1,4 @@
-package io.legs.ui.client
+package thirdparty
 
 import japgolly.scalajs.react.vdom.prefix_<^._
 

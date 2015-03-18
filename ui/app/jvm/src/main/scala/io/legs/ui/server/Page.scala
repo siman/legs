@@ -7,22 +7,29 @@ object Page{
 
 	val boot = 	"io.legs.ui.client.Client().main()"
 
+	object v {
+		val bootstrap = "3.3.2"
+		val fontAwesome = "4.3.2"
+		val react = "0.12.2"
+		val jQuery = "2.1.3"
+	}
+
 	val skeleton =
 		"<!DOCTYPE html>" + html(
 			head(
 				meta(content := "text/html;charset=utf-8", httpEquiv := "Content-Type"),
 				meta(content := "utf-8", httpEquiv := "encoding"),
 				link(
-					href := "http://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css",
+					href := s"http://maxcdn.bootstrapcdn.com/bootstrap/${v.bootstrap}/css/bootstrap.min.css",
 					rel := "stylesheet"
 				),
 				link(
-					href := "http://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css",
+					href := s"http://maxcdn.bootstrapcdn.com/font-awesome/${v.fontAwesome}/css/font-awesome.min.css",
 					rel := "stylesheet"
 				),
-				script( src := "//cdnjs.cloudflare.com/ajax/libs/react/0.12.2/react-with-addons.min.js" ),
-				script( src := "https://code.jquery.com/jquery-2.1.3.min.js" ),
-				script( src := "http://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js" ),
+				script( src := s"//cdnjs.cloudflare.com/ajax/libs/react/${v.react}/react-with-addons.min.js" ),
+				script( src := s"https://code.jquery.com/jquery-${v.jQuery}.min.js" ),
+				script( src := s"http://maxcdn.bootstrapcdn.com/bootstrap/${v.bootstrap}/js/bootstrap.min.js" ),
 				script( src := "/js/shared-fastopt.js" ),
 				meta( name := "viewport", content := "width=device-width, initial-scale=1" ),
 				style2(

@@ -1,4 +1,4 @@
-package io.legs.ui.client.components
+package thirdparty
 
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.prefix_<^._
@@ -26,10 +26,10 @@ object Bootstrap {
 
 	val Panel = ReactComponentB[PanelProps]("Panel")
 		.render { (P, C) =>
-		<.div(^.className := s"panel panel-${P.style}")(
-			<.div(^.className := "panel-heading")(P.heading),
-			<.div(^.className := "panel-body")(C)
-		)
+			<.div(^.className := s"panel panel-${P.style}")(
+				<.div(^.className := "panel-heading")(P.heading),
+				<.div(^.className := "panel-body")(C)
+			)
 	}.build
 
 }
