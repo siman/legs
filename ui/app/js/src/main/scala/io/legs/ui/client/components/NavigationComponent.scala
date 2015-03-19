@@ -26,7 +26,6 @@ object NavigationComponent {
 			.render( P => {
 				val (items, router) = P
 				<.ul(^.className := "nav navbar-nav")(
-					// build a list of menu items
 					items.map { item => MainMenuItem((item,router)) }
 				)
 			})

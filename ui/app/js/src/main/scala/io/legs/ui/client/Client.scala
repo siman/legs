@@ -23,34 +23,41 @@ object Client extends JSApp {
 
 	val menuItems = List(
 		MenuItem("Dashboard", Icon.dashboard, MainRouter.dashboardLoc,true),
-		MenuItem("Todo", Icon.check, MainRouter.todoLoc)
+		MenuItem("Schedules", Icon.check, MainRouter.scheduledLoc)
 	)
 
 	@JSExport
 	def main(): Unit = {
-
-		val baseUrl = BaseUrl(dom.window.location.href.takeWhile(_ != '#'))
-		val router  = MainRouter.routingEngine(baseUrl)
-
 		implicit val backend = NozzleClientBackend
 
-		React.render(RootComponent(router),dom.document.body)
+		MainRouter.router
+
+		React.render(RootComponent(),dom.document.body)
 	}
 
-	val RootComponent = ReactComponentB[MainRouter.Router]("Root")
-		.render(router =>
+	val RootComponent = ReactComponentB[Unit]("Root")
+		.initialState(menuItems)
+		.render((_,S) =>
 			<.div(
 				<.nav(^.className := "navbar navbar-inverse navbar-fixed-top")(
 					<.div(^.className := "container")(
 						<.div(^.className := "navbar-header")(<.span(^.className := "navbar-brand")("SPA Tutorial")),
 						<.div(^.className := "collapse navbar-collapse")(
-							NavigationComponent.component((menuItems,router))
+							NavigationComponent.component((S, MainRouter.router))
 						)
 					)
 				),
-				<.div(^.className := "container")(Router.component(router)())
+				<.div(^.className := "container")(MainRouter.routerComponent())
 			)
-		).build
+		)
+		.componentDidMount(scope =>
+			MainRouter.listen(loc=>
+				scope.modState(state => {
+					state.map(i => i.copy(isActive = i.location == loc))
+				})
+			)
+		)
+		.buildU
 
 
 }

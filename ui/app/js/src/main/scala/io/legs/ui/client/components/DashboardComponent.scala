@@ -24,7 +24,7 @@ object DashboardComponent {
 			<.div(
 				<.h2("_"),
 				<.div(jobs()),
-				<.div(router.link(MainRouter.todoLoc)("Check the job queue!"))
+				<.div(router.link(MainRouter.scheduledLoc)("Check the job queue!"))
 			)
 		}).build
 
