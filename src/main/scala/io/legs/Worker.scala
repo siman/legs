@@ -13,7 +13,7 @@ import scala.concurrent.duration.Duration
 import scala.util.{Failure, Success, Try}
 
 
-class Worker(coordinator: ActorRef, job: Job) extends Actor {
+class Worker(coordinator: ActorRef, job: Job, userSpecialized : List[Specialization] = Nil) extends Actor {
 
 	implicit val ctx = context.dispatcher
 
@@ -78,7 +78,7 @@ object Worker {
 
 	private lazy val logger = Logger(LoggerFactory.getLogger(getClass))
 
-	def props(coordinator: ActorRef, job:Job) : Props = Props(new Worker(coordinator,job))
+	def props(coordinator: ActorRef, job:Job, userSpecialized : List[Specialization] = Nil) : Props = Props(new Worker(coordinator,job,userSpecialized))
 
 	def execute(jsonString: String, state:Map[String,Any] = Map(), userSpecialized : List[Specialization] = Nil): Try[Yield] =
 		 Try { Await.result(executeAsync(jsonString, state,userSpecialized),Duration("5 minutes")) }

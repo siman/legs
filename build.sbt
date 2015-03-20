@@ -10,7 +10,7 @@ sonatypeSettings
 
 organization := "io.legs"
 name := "legs"
-version := "0.8.7.1"
+version := "0.8.7.3"
 scalaVersion := "2.11.5"
 licenses := Seq("MIT-style" -> url("http://opensource.org/licenses/mit-license.php"))
 homepage := Some(url("https://github.com/uniformlyrandom/legs"))

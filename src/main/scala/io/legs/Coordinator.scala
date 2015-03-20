@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 
-class Coordinator(labels: List[String], numMaxWorkers: Int) extends Actor {
+class Coordinator(labels: List[String], numMaxWorkers: Int,userSpecialized : List[Specialization] = Nil) extends Actor {
 
 	import io.legs.Coordinator.logger
 
@@ -73,7 +73,7 @@ class Coordinator(labels: List[String], numMaxWorkers: Int) extends Actor {
 
 	private def spinUpWorker(job:Job){
 		logger.info(s"spinning up worker with job id:${job.id}")
-		val newWorker = context.system.actorOf(Worker.props(context.self,job))
+		val newWorker = context.system.actorOf(Worker.props(context.self,job,userSpecialized))
 		workers ::= newWorker
 		newWorker ! StartWork
 	}
@@ -91,9 +91,9 @@ object Coordinator {
 
 	lazy val logger = Logger(LoggerFactory.getLogger(getClass))
 
-	def props(labels: List[String], numWorkers: Int) : Props = Props(new Coordinator(labels,numWorkers))
+	def props(labels: List[String], numWorkers: Int, userSpecialized : List[Specialization] = Nil) : Props = Props(new Coordinator(labels,numWorkers,userSpecialized))
 
-	def start(labels: List[String], numWorkers: Int) : ActorRef = {
+	def start(labels: List[String], numWorkers: Int, userSpecialized : List[Specialization] = Nil) : ActorRef = {
 		val system = ActorSystem(actorSystemName)
 		system.actorOf(props(labels,numWorkers))
 	}
