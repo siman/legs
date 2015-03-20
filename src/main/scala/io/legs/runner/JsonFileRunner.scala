@@ -30,8 +30,8 @@ object JsonFileRunner {
 			val jsonStr = scala.io.Source.fromFile(input("file").get,"UTF-8").mkString
 
 			Worker.execute(jsonStr) match {
-				case Success(v) => logger.info("last yield:",v)
-				case Failure(e) => logger.info("failed executing json Str",e)
+				case Success(v) => println("last yield:",v)
+				case Failure(e) => println("failed executing json Str",e)
 			}
 		} else {
 			logger.error("did not understand input:\"" + args.mkString(" ") + "\"")

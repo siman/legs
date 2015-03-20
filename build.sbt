@@ -32,12 +32,10 @@ initialize := {
 }
 
 lazy val gendocs = taskKey[Unit]("generated the Legs.io API documentation")
-
-val runJson = inputKey[Unit]("use JSON file as job source")
-
-fullRunInputTask(runJson,Compile,"io.legs.runner.JsonFileRunner")
-
 fullRunTask(gendocs, Compile, "io.legs.documentation.GenerateDocumentation")
+
+lazy val runJson = inputKey[Unit]("use JSON file as job source")
+fullRunInputTask(runJson, Compile, "io.legs.runner.JsonFileRunner")
 
 resolvers += "Sonatype OSS releases" at "https://oss.sonatype.org/service/local/staging/deploy/maven2"
 
