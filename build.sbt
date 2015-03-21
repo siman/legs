@@ -1,4 +1,5 @@
 import sbt._
+enablePlugins(ScalaJSPlugin)
 
 import sbtassembly.Plugin._
 import AssemblyKeys._
@@ -21,7 +22,6 @@ publishArtifact in Test := false
 useGpg := true
 pomIncludeRepository := { _ => false }
 javaOptions in Test := Seq("-DisTest=yes")
-fork in Test := true
 parallelExecution in Test := false
 
 initialize := {
