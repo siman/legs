@@ -1,14 +1,14 @@
 Legs.io
 ====
 
-scraping and job orchestration library
+Scraping and job orchestration library.
 
 [![Build Status](https://travis-ci.org/uniformlyrandom/legs.png)](https://travis-ci.org/uniformlyrandom/legs)
 
 
 ### Project goal
 
-Eliminate the cruft, boiler plate and minimize time needed to write a scraper. Ideally only the business logic (moving parts) need to be written, all supporting machinery needs to be already in place and provide simple intuitive APIs
+Eliminate the cruft, boilerplate and minimize time needed to write a scraper. Ideally only the business logic (moving parts) need to be written, all supporting machinery needs to be already in place and provide simple intuitive APIs
 
 ### Installation
 
